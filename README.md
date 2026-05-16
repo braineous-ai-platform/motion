@@ -15,3 +15,21 @@ Motion is transport-agnostic by design. Kafka is one possible event transport, n
 The goal is not to build another streaming framework.
 
 The goal is to provide a stable operational motion substrate for intelligent systems built on top of evolving operational state.
+
+## Why Operational Motion Matters
+
+Traditional event systems focus on transporting and processing events.
+
+However, intelligent systems require more than event delivery alone.
+
+Operational behavior emerges through evolving state over time — sequences of changes, temporal relationships, recurring patterns, and shifting operational conditions.
+
+An isolated event rarely carries enough meaning on its own.
+
+The significance of operational activity often depends on how state evolves across time windows, relationships, and governed execution flows.
+
+Motion introduces operational motion as a runtime abstraction over this evolving behavior.
+
+Instead of treating events as disconnected messages, Motion structures operational change into deterministic runtime motion envelopes that can participate in governed reasoning workflows.
+
+This allows intelligent systems to reason about operational evolution in a controlled, observable, and runtime-oriented way.
