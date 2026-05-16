@@ -33,3 +33,19 @@ Motion introduces operational motion as a runtime abstraction over this evolving
 Instead of treating events as disconnected messages, Motion structures operational change into deterministic runtime motion envelopes that can participate in governed reasoning workflows.
 
 This allows intelligent systems to reason about operational evolution in a controlled, observable, and runtime-oriented way.
+
+## Motion as a Runtime Primitive
+
+Events are inputs into the runtime, but they are not the runtime primitive itself.
+
+Motion introduces operational motion as the primary runtime abstraction for representing evolving operational state over time.
+
+Within the runtime, operational change is structured into MotionFrames.
+
+A MotionFrame represents a bounded unit of operational evolution that can participate in governed reasoning workflows.
+
+Unlike isolated events, MotionFrames carry structured operational context that allows intelligent systems to reason about state evolution in a controlled and observable way.
+
+As MotionFrames accumulate across time, they form a runtime representation of operational movement that can drive deterministic execution behavior around inherently non-deterministic reasoning systems.
+
+This shifts the system from processing disconnected events toward reasoning over evolving operational motion.
