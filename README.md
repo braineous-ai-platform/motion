@@ -99,3 +99,23 @@ Instead, intelligent systems reason against evolving operational context that re
 Within BraineousAI, runtime query behavior is driven not only by current operational state, but also by how operational state has evolved over time.
 
 This allows deterministic runtime structure to exist around continuously evolving operational conditions and inherently non-deterministic reasoning systems.
+
+## Runtime Query and Reasoning
+
+Within Motion-enabled intelligent systems, runtime queries execute against evolving operational context rather than isolated events or static records.
+
+Queries express operational intent declaratively while the runtime constructs the reasoning conditions required for execution.
+
+As operational motion evolves, MotionFrames continuously shape the runtime context used during reasoning workflows.
+
+This allows intelligent systems to reason against operational progression, temporal relationships, evolving state, and governed runtime activity.
+
+Reasoning execution remains inherently non-deterministic.
+
+However, the surrounding runtime structure remains deterministic through controlled context shaping, governed execution semantics, and stable operational contracts.
+
+Within the BraineousAI runtime, prompt construction becomes an internal runtime responsibility rather than the primary developer abstraction.
+
+This shifts intelligent system development away from manual prompt orchestration and toward governed operational reasoning workflows built on evolving operational context.
+
+The result is a runtime model where reasoning behavior operates within controlled operational boundaries while remaining adaptable to continuously evolving operational conditions.
