@@ -139,3 +139,21 @@ This introduces deterministic operational control around inherently non-determin
 Governance is therefore not treated as post-processing around intelligent systems.
 
 It is part of the runtime execution model itself.
+
+## Current Status
+
+Motion is currently focused on establishing the foundational runtime primitives required for event-native operational intelligence systems.
+
+Current development areas include:
+
+- MotionEvent runtime semantics
+- MotionFrame lifecycle modeling
+- evolving operational context integration
+- runtime query and reasoning workflows
+- governed operational mutation flows
+- event-native runtime infrastructure patterns
+- operational observability and auditability
+
+The current focus is on building stable runtime foundations before expanding into broader operational intelligence workflows and developer experience surfaces.
+
+Motion is being developed as part of the broader BraineousAI ecosystem for governed intelligent runtime systems built on evolving operational state.
