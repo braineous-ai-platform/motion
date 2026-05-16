@@ -49,3 +49,17 @@ Unlike isolated events, MotionFrames carry structured operational context that a
 As MotionFrames accumulate across time, they form a runtime representation of operational movement that can drive deterministic execution behavior around inherently non-deterministic reasoning systems.
 
 This shifts the system from processing disconnected events toward reasoning over evolving operational motion.
+
+## Relationship to BraineousAI
+
+Motion is designed as a separate operational runtime within the broader BraineousAI ecosystem.
+
+Its responsibility is focused specifically on representing and managing evolving operational motion over time.
+
+While Motion can operate independently as an event-native runtime, it is designed to integrate with the broader BraineousAI reasoning stack through stable runtime contracts.
+
+Motion is not the reasoning engine itself.
+
+Instead, it provides the operational motion substrate used to update context, drive governed execution flows, and support deterministic runtime behavior around evolving operational state.
+
+This separation allows operational motion infrastructure and intelligent runtime behavior to evolve independently while remaining architecturally aligned.
