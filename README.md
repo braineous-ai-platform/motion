@@ -63,3 +63,21 @@ Motion is not the reasoning engine itself.
 Instead, it provides the operational motion substrate used to update context, drive governed execution flows, and support deterministic runtime behavior around evolving operational state.
 
 This separation allows operational motion infrastructure and intelligent runtime behavior to evolve independently while remaining architecturally aligned.
+
+## Event-Native Operational Systems
+
+Modern intelligent systems increasingly operate in event-native environments.
+
+Operational activity is continuously produced through transactions, state transitions, workflow execution, policy decisions, external signals, and evolving runtime behavior.
+
+Motion is designed to operate on top of this event-native foundation.
+
+Incoming operational events are normalized into MotionEvents that participate in runtime motion semantics.
+
+Across bounded operational windows, MotionEvents are structured into MotionFrames that represent meaningful operational evolution over time.
+
+This aligns naturally with modern distributed runtime concepts such as temporal processing, evolving state, and event-driven operational systems.
+
+Motion does not replace event infrastructure.
+
+Instead, it introduces a higher-order operational runtime abstraction that allows intelligent systems to reason about evolving operational motion in a governed and deterministic way.
