@@ -21,5 +21,95 @@ package io.braineous.motion.core.model;
  * systems to reason against operational evolution rather than
  * disconnected events alone.
  */
-public class MotionFrame {
+public class MotionFrame extends MotionBaseModel {
+
+    private String frameId;
+    private String frameType;
+    private String windowStart;
+    private String windowEnd;
+    private String sequence;
+    private String status;
+    private String eventsJson;
+    private String metadataJson;
+
+    public MotionFrame() {
+    }
+
+    public String getFrameId() {
+        return frameId;
+    }
+
+    public void setFrameId(String frameId) {
+        this.frameId = frameId;
+    }
+
+    public String getFrameType() {
+        return frameType;
+    }
+
+    public void setFrameType(String frameType) {
+        this.frameType = frameType;
+    }
+
+    public String getWindowStart() {
+        return windowStart;
+    }
+
+    public void setWindowStart(String windowStart) {
+        this.windowStart = windowStart;
+    }
+
+    public String getWindowEnd() {
+        return windowEnd;
+    }
+
+    public void setWindowEnd(String windowEnd) {
+        this.windowEnd = windowEnd;
+    }
+
+    public String getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(String sequence) {
+        this.sequence = sequence;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getEventsJson() {
+        return eventsJson;
+    }
+
+    public void setEventsJson(String eventsJson) {
+        this.eventsJson = eventsJson;
+    }
+
+    public String getMetadataJson() {
+        return metadataJson;
+    }
+
+    public void setMetadataJson(String metadataJson) {
+        this.metadataJson = metadataJson;
+    }
+
+    @Override
+    public String toString() {
+        return "MotionFrame{" +
+                "frameId='" + frameId + '\'' +
+                ", frameType='" + frameType + '\'' +
+                ", windowStart='" + windowStart + '\'' +
+                ", windowEnd='" + windowEnd + '\'' +
+                ", sequence='" + sequence + '\'' +
+                ", status='" + status + '\'' +
+                ", eventsJson='" + eventsJson + '\'' +
+                ", metadataJson='" + metadataJson + '\'' +
+                '}';
+    }
 }
