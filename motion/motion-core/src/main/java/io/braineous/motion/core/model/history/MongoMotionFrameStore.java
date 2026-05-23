@@ -181,12 +181,12 @@ public class MongoMotionFrameStore implements MotionFrameStore {
             return null;
         }
 
-        Object recordObj = doc.get("record");
-        if (recordObj == null) {
+        Document recordDoc = (Document) doc.get("record");
+        if (recordDoc == null) {
             return null;
         }
 
-        return gson.fromJson(recordObj.toString(), MotionFrameRecord.class);
+        return gson.fromJson(recordDoc.toJson(), MotionFrameRecord.class);
     }
 
     private String safe(String value) {

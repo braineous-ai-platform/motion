@@ -33,8 +33,8 @@ public class MotionFrameRecordTest {
         record.setWindowEnd("2026-05-22T10:05:00Z");
         record.setSequence("1");
         record.setMotionFrame(frame);
-        record.setCreatedAt(Instant.parse("2026-05-22T10:06:00Z"));
-        record.setUpdatedAt(Instant.parse("2026-05-22T10:07:00Z"));
+        record.setCreatedAt("2026-05-22T10:06:00Z");
+        record.setUpdatedAt("2026-05-22T10:07:00Z");
 
         assertEquals("record-1", record.getRecordId());
         assertEquals("context-1", record.getContextId());
@@ -48,8 +48,8 @@ public class MotionFrameRecordTest {
         assertEquals("1", record.getSequence());
         assertNotNull(record.getMotionFrame());
         assertEquals("frame-1", record.getMotionFrame().getFrameId());
-        assertEquals(Instant.parse("2026-05-22T10:06:00Z"), record.getCreatedAt());
-        assertEquals(Instant.parse("2026-05-22T10:07:00Z"), record.getUpdatedAt());
+        assertEquals("2026-05-22T10:06:00Z", record.getCreatedAt());
+        assertEquals("2026-05-22T10:07:00Z", record.getUpdatedAt());
 
         Console.log("record", record.toString());
     }
