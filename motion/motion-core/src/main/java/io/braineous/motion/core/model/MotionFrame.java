@@ -29,10 +29,11 @@ public class MotionFrame extends MotionBaseModel {
     private String windowEnd;
     private String sequence;
     private String status;
-    private String eventsJson;
+    private java.util.List<MotionEvent> motionEvents;
     private String metadataJson;
 
     public MotionFrame() {
+        this.motionEvents = new java.util.ArrayList<MotionEvent>();
     }
 
     public String getFrameId() {
@@ -83,12 +84,21 @@ public class MotionFrame extends MotionBaseModel {
         this.status = status;
     }
 
-    public String getEventsJson() {
-        return eventsJson;
+    public java.util.List<MotionEvent> getMotionEvents() {
+        return motionEvents;
     }
 
-    public void setEventsJson(String eventsJson) {
-        this.eventsJson = eventsJson;
+    public void setMotionEvents(java.util.List<MotionEvent> motionEvents) {
+        this.motionEvents = motionEvents;
+    }
+
+    public void addMotionEvent(MotionEvent motionEvent) {
+        if (this.motionEvents == null) {
+            this.motionEvents = new java.util.ArrayList<MotionEvent>();
+        }
+        if (motionEvent != null) {
+            this.motionEvents.add(motionEvent);
+        }
     }
 
     public String getMetadataJson() {
@@ -108,7 +118,7 @@ public class MotionFrame extends MotionBaseModel {
                 ", windowEnd='" + windowEnd + '\'' +
                 ", sequence='" + sequence + '\'' +
                 ", status='" + status + '\'' +
-                ", eventsJson='" + eventsJson + '\'' +
+                ", motionEvents=" + motionEvents +
                 ", metadataJson='" + metadataJson + '\'' +
                 '}';
     }

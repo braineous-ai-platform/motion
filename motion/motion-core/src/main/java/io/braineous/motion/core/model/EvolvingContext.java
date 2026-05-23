@@ -1,5 +1,8 @@
 package io.braineous.motion.core.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * EvolvingContext represents the accumulated operational evolution
  * of a system across ordered MotionFrames over time.
@@ -29,10 +32,11 @@ public class EvolvingContext extends MotionBaseModel {
     private String subjectId;
     private String subjectType;
     private String status;
-    private String framesJson;
+    private List<MotionFrame> motionFrames;
     private String metadataJson;
 
     public EvolvingContext() {
+        this.motionFrames = new ArrayList<MotionFrame>();
     }
 
     public String getContextId() {
@@ -75,12 +79,16 @@ public class EvolvingContext extends MotionBaseModel {
         this.status = status;
     }
 
-    public String getFramesJson() {
-        return framesJson;
+    public List<MotionFrame> getMotionFrames() {
+        return motionFrames;
     }
 
-    public void setFramesJson(String framesJson) {
-        this.framesJson = framesJson;
+    public void setMotionFrames(List<MotionFrame> motionFrames) {
+        this.motionFrames = motionFrames;
+    }
+
+    public void addMotionFrame(MotionFrame motionFrame) {
+        this.motionFrames.add(motionFrame);
     }
 
     public String getMetadataJson() {
@@ -99,7 +107,7 @@ public class EvolvingContext extends MotionBaseModel {
                 ", subjectId='" + subjectId + '\'' +
                 ", subjectType='" + subjectType + '\'' +
                 ", status='" + status + '\'' +
-                ", framesJson='" + framesJson + '\'' +
+                ", motionFrames=" + motionFrames +
                 ", metadataJson='" + metadataJson + '\'' +
                 '}';
     }
