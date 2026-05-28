@@ -1,5 +1,7 @@
 package ai.braineous.motion.ingestion.eventprocessor.model;
 
+import io.braineous.motion.core.model.MotionBaseModel;
+
 /**
  * RawEvent represents the original inbound event entering the Motion ingestion pipeline.
  *
@@ -42,5 +44,85 @@ package ai.braineous.motion.ingestion.eventprocessor.model;
  * RawEvent is intentionally infrastructure-agnostic and domain-neutral.
  * </p>
  */
-public class RawEvent {
+public class RawEvent extends MotionBaseModel {
+
+    private String rawEventId;
+    private String source;
+    private String sourceType;
+    private String eventType;
+    private String receivedAt;
+    private String payloadJson;
+    private String metadataJson;
+
+    public RawEvent() {
+    }
+
+    public String getRawEventId() {
+        return rawEventId;
+    }
+
+    public void setRawEventId(String rawEventId) {
+        this.rawEventId = rawEventId;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public String getReceivedAt() {
+        return receivedAt;
+    }
+
+    public void setReceivedAt(String receivedAt) {
+        this.receivedAt = receivedAt;
+    }
+
+    public String getPayloadJson() {
+        return payloadJson;
+    }
+
+    public void setPayloadJson(String payloadJson) {
+        this.payloadJson = payloadJson;
+    }
+
+    public String getMetadataJson() {
+        return metadataJson;
+    }
+
+    public void setMetadataJson(String metadataJson) {
+        this.metadataJson = metadataJson;
+    }
+
+    @Override
+    public String toString() {
+        return "RawEvent{" +
+                "rawEventId='" + rawEventId + '\'' +
+                ", source='" + source + '\'' +
+                ", sourceType='" + sourceType + '\'' +
+                ", eventType='" + eventType + '\'' +
+                ", receivedAt='" + receivedAt + '\'' +
+                ", payloadJson='" + payloadJson + '\'' +
+                ", metadataJson='" + metadataJson + '\'' +
+                '}';
+    }
 }
