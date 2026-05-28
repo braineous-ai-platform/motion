@@ -1,5 +1,7 @@
 package ai.braineous.motion.ingestion.eventprocessor.model;
 
+import io.braineous.motion.core.model.MotionBaseModel;
+
 /**
  * MotionEnvelope represents the standardized ingestion wrapper
  * surrounding a RawEvent as it enters the Motion pipeline.
@@ -61,5 +63,85 @@ package ai.braineous.motion.ingestion.eventprocessor.model;
  *     <li>Replay-aware</li>
  * </ul>
  */
-public class MotionEnvelope {
+public class MotionEnvelope extends MotionBaseModel {
+
+    private String envelopeId;
+    private String tenantId;
+    private String correlationId;
+    private String traceId;
+    private String receivedAt;
+    private RawEvent rawEvent;
+    private String metadataJson;
+
+    public MotionEnvelope() {
+    }
+
+    public String getEnvelopeId() {
+        return envelopeId;
+    }
+
+    public void setEnvelopeId(String envelopeId) {
+        this.envelopeId = envelopeId;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
+    }
+
+    public String getTraceId() {
+        return traceId;
+    }
+
+    public void setTraceId(String traceId) {
+        this.traceId = traceId;
+    }
+
+    public String getReceivedAt() {
+        return receivedAt;
+    }
+
+    public void setReceivedAt(String receivedAt) {
+        this.receivedAt = receivedAt;
+    }
+
+    public RawEvent getRawEvent() {
+        return rawEvent;
+    }
+
+    public void setRawEvent(RawEvent rawEvent) {
+        this.rawEvent = rawEvent;
+    }
+
+    public String getMetadataJson() {
+        return metadataJson;
+    }
+
+    public void setMetadataJson(String metadataJson) {
+        this.metadataJson = metadataJson;
+    }
+
+    @Override
+    public String toString() {
+        return "MotionEnvelope{" +
+                "envelopeId='" + envelopeId + '\'' +
+                ", tenantId='" + tenantId + '\'' +
+                ", correlationId='" + correlationId + '\'' +
+                ", traceId='" + traceId + '\'' +
+                ", receivedAt='" + receivedAt + '\'' +
+                ", rawEvent=" + rawEvent +
+                ", metadataJson='" + metadataJson + '\'' +
+                '}';
+    }
 }
