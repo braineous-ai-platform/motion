@@ -51,5 +51,45 @@ package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
  * operate independently after ingestion completes.
  * </p>
  */
+import ai.braineous.motion.ingestion.eventprocessor.model.MotionEnvelope;
+import ai.braineous.motion.ingestion.eventprocessor.model.MotionReplaySignal;
+import io.braineous.motion.core.model.MotionEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+@ApplicationScoped
 public class MotionIngestionOrchestrator {
+
+    @Inject
+    MotionValidationOrchestrator validationOrchestrator;
+
+    @Inject
+    MotionEventNormalizer eventNormalizer;
+
+    @Inject
+    MotionReplayOrchestrator replayOrchestrator;
+
+    @Inject
+    MotionEventPublisher eventPublisher;
+
+    public MotionEvent ingest(MotionEnvelope motionEnvelope) {
+
+        boolean valid =
+                validationOrchestrator.validate(motionEnvelope);
+
+        if (!valid) {
+            return null;
+        }
+
+        MotionEvent motionEvent =
+                eventNormalizer.normalize(motionEnvelope);
+
+        MotionReplaySignal replaySignal =
+                replayOrchestrator.evaluate(motionEvent);
+
+        MotionEvent publishedEvent =
+                eventPublisher.publish(motionEvent);
+
+        return publishedEvent;
+    }
 }
