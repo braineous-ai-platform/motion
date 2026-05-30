@@ -1,4 +1,4 @@
-package ai.braineous.motion.ingestion.eventprocessor.service;
+package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
 
 /**
  * MotionEventNormalizer transforms inbound ingestion artifacts into

@@ -1,4 +1,4 @@
-package ai.braineous.motion.ingestion.eventprocessor.service;
+package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
 
 /**
  * MotionValidationOrchestrator coordinates validation of inbound

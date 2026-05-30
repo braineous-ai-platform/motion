@@ -1,4 +1,8 @@
-package ai.braineous.motion.ingestion.eventprocessor.service;
+package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
+
+import ai.braineous.motion.ingestion.eventprocessor.model.MotionReplaySignal;
+import io.braineous.motion.core.model.MotionEvent;
+import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * MotionReplayOrchestrator coordinates replay evaluation for
@@ -47,5 +51,27 @@ package ai.braineous.motion.ingestion.eventprocessor.service;
  * replay contract used by downstream operational systems.
  * </p>
  */
+@ApplicationScoped
 public class MotionReplayOrchestrator {
+
+    public MotionReplaySignal evaluate(MotionEvent motionEvent) {
+
+        MotionReplaySignal replaySignal = new MotionReplaySignal();
+
+        replaySignal.setReplayLevel("FAILURE_RECOVERY");
+        replaySignal.setReasonCode("REPLAY_NOT_REQUIRED");
+        replaySignal.setMessage("Replay is not required for accepted Motion event");
+
+        if (motionEvent != null) {
+            replaySignal.setMotionEventId(motionEvent.getEventId());
+            replaySignal.setEventType(motionEvent.getEventType());
+            replaySignal.setReplayFromTime(motionEvent.getOccurredAt());
+            replaySignal.setReplayToTime(motionEvent.getOccurredAt());
+            replaySignal.setAsOfTime(motionEvent.getOccurredAt());
+            replaySignal.setMotionEventJson(motionEvent.toJson());
+            replaySignal.setMetadataJson(motionEvent.getMetadataJson());
+        }
+
+        return replaySignal;
+    }
 }

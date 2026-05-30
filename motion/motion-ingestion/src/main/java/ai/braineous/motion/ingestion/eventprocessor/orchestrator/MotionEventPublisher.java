@@ -1,4 +1,4 @@
-package ai.braineous.motion.ingestion.eventprocessor.service;
+package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
 
 import io.braineous.motion.core.model.MotionEvent;
 import jakarta.enterprise.context.ApplicationScoped;
