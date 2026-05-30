@@ -1,5 +1,9 @@
 package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
 
+import ai.braineous.motion.ingestion.eventprocessor.model.MotionEnvelope;
+import ai.braineous.motion.ingestion.eventprocessor.model.RawEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+
 /**
  * MotionValidationOrchestrator coordinates validation of inbound
  * motion ingestion requests.
@@ -48,5 +52,41 @@ package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
  * only after successful validation.
  * </p>
  */
+@ApplicationScoped
 public class MotionValidationOrchestrator {
+
+    public boolean validate(MotionEnvelope motionEnvelope) {
+
+        if (motionEnvelope == null) {
+            return false;
+        }
+
+        if (motionEnvelope.getEnvelopeId() == null) {
+            return false;
+        }
+
+        if (motionEnvelope.getCorrelationId() == null) {
+            return false;
+        }
+
+        if (motionEnvelope.getReceivedAt() == null) {
+            return false;
+        }
+
+        RawEvent rawEvent = motionEnvelope.getRawEvent();
+
+        if (rawEvent == null) {
+            return false;
+        }
+
+        if (rawEvent.getEventType() == null) {
+            return false;
+        }
+
+        if (rawEvent.getSourceType() == null) {
+            return false;
+        }
+
+        return true;
+    }
 }
