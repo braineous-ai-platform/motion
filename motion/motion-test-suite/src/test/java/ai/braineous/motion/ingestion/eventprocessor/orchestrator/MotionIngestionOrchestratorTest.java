@@ -1,6 +1,7 @@
 package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
 
 import ai.braineous.motion.ingestion.eventprocessor.model.MotionEnvelope;
+import ai.braineous.motion.ingestion.eventprocessor.model.MotionResponseResult;
 import ai.braineous.motion.ingestion.eventprocessor.model.RawEvent;
 import ai.braineous.rag.prompt.observe.Console;
 import io.braineous.motion.core.model.MotionEvent;
@@ -49,10 +50,26 @@ public class MotionIngestionOrchestratorTest {
         orchestrator.eventPublisher =
                 new MotionEventPublisher();
 
-        MotionEvent motionEvent =
+        orchestrator.responseResultBuilder =
+                new MotionResponseResultBuilder();
+
+        MotionResponseResult responseResult =
                 orchestrator.ingest(motionEnvelope);
 
         Console.log("motionEnvelope", motionEnvelope.toJson());
+        Console.log("responseResult", responseResult.toJson());
+
+        assertEquals("ACCEPTED", responseResult.getStatus());
+        assertEquals("MOTION_EVENT_ACCEPTED", responseResult.getReasonCode());
+        assertEquals("Motion event accepted into ingestion pipeline", responseResult.getMessage());
+
+        assertEquals("envelope-1", responseResult.getResultId());
+        assertEquals("envelope-1", responseResult.getMotionEventId());
+        assertEquals("{\"tenant\":\"tenant-1\"}", responseResult.getMetadataJson());
+
+        MotionEvent motionEvent =
+                MotionEvent.fromJson(responseResult.getMotionEventJson(), MotionEvent.class);
+
         Console.log("motionEvent", motionEvent.toJson());
 
         assertEquals("envelope-1", motionEvent.getEventId());
@@ -83,12 +100,15 @@ public class MotionIngestionOrchestratorTest {
         orchestrator.eventPublisher =
                 new MotionEventPublisher();
 
-        MotionEvent motionEvent =
+        orchestrator.responseResultBuilder =
+                new MotionResponseResultBuilder();
+
+        MotionResponseResult responseResult =
                 orchestrator.ingest(null);
 
-        Console.log("motionEvent", String.valueOf(motionEvent));
+        Console.log("responseResult", String.valueOf(responseResult));
 
-        assertNull(motionEvent);
+        assertNull(responseResult);
     }
 
     @Test
@@ -123,13 +143,16 @@ public class MotionIngestionOrchestratorTest {
         orchestrator.eventPublisher =
                 new MotionEventPublisher();
 
-        MotionEvent motionEvent =
+        orchestrator.responseResultBuilder =
+                new MotionResponseResultBuilder();
+
+        MotionResponseResult responseResult =
                 orchestrator.ingest(motionEnvelope);
 
         Console.log("motionEnvelope", motionEnvelope.toJson());
-        Console.log("motionEvent", String.valueOf(motionEvent));
+        Console.log("responseResult", String.valueOf(responseResult));
 
-        assertNull(motionEvent);
+        assertNull(responseResult);
     }
 
     @Test
@@ -170,26 +193,29 @@ public class MotionIngestionOrchestratorTest {
         orchestrator.eventPublisher =
                 new MotionEventPublisher();
 
-        MotionEvent motionEvent =
+        orchestrator.responseResultBuilder =
+                new MotionResponseResultBuilder();
+
+        MotionResponseResult responseResult =
                 orchestrator.ingest(motionEnvelope);
 
         String json =
-                motionEvent.toJson();
+                responseResult.toJson();
 
-        Console.log("motionEventJson", json);
+        Console.log("responseResultJson", json);
 
-        MotionEvent restored =
-                MotionEvent.fromJson(json, MotionEvent.class);
+        MotionResponseResult restored =
+                MotionResponseResult.fromJson(json, MotionResponseResult.class);
 
-        Console.log("restoredMotionEvent", restored.toJson());
+        Console.log("restoredResponseResult", restored.toJson());
 
-        assertEquals(motionEvent.getEventId(), restored.getEventId());
-        assertEquals(motionEvent.getEventType(), restored.getEventType());
-        assertEquals(motionEvent.getOccurredAt(), restored.getOccurredAt());
-        assertEquals(motionEvent.getSubjectId(), restored.getSubjectId());
-        assertEquals(motionEvent.getSubjectType(), restored.getSubjectType());
-        assertEquals(motionEvent.getOperation(), restored.getOperation());
-        assertEquals(motionEvent.getPayloadJson(), restored.getPayloadJson());
-        assertEquals(motionEvent.getMetadataJson(), restored.getMetadataJson());
+        assertEquals(responseResult.getResultId(), restored.getResultId());
+        assertEquals(responseResult.getStatus(), restored.getStatus());
+        assertEquals(responseResult.getReasonCode(), restored.getReasonCode());
+        assertEquals(responseResult.getMessage(), restored.getMessage());
+        assertEquals(responseResult.getMotionEventId(), restored.getMotionEventId());
+        assertEquals(responseResult.getMotionEventJson(), restored.getMotionEventJson());
+        assertEquals(responseResult.getReplaySignalJson(), restored.getReplaySignalJson());
+        assertEquals(responseResult.getMetadataJson(), restored.getMetadataJson());
     }
 }

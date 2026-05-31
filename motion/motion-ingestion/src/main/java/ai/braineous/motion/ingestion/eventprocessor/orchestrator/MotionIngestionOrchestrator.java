@@ -28,7 +28,7 @@ package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
  *     <li>Coordinating event normalization</li>
  *     <li>Coordinating replay evaluation</li>
  *     <li>Coordinating event publication</li>
- *     <li>Producing ingestion results</li>
+ *     <li>Producing response results</li>
  * </ul>
  *
  * <p>
@@ -53,6 +53,7 @@ package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
  */
 import ai.braineous.motion.ingestion.eventprocessor.model.MotionEnvelope;
 import ai.braineous.motion.ingestion.eventprocessor.model.MotionReplaySignal;
+import ai.braineous.motion.ingestion.eventprocessor.model.MotionResponseResult;
 import io.braineous.motion.core.model.MotionEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -72,7 +73,10 @@ public class MotionIngestionOrchestrator {
     @Inject
     MotionEventPublisher eventPublisher;
 
-    public MotionEvent ingest(MotionEnvelope motionEnvelope) {
+    @Inject
+    MotionResponseResultBuilder responseResultBuilder;
+
+    public MotionResponseResult ingest(MotionEnvelope motionEnvelope) {
 
         boolean valid =
                 validationOrchestrator.validate(motionEnvelope);
@@ -90,6 +94,12 @@ public class MotionIngestionOrchestrator {
         MotionEvent publishedEvent =
                 eventPublisher.publish(motionEvent);
 
-        return publishedEvent;
+        MotionResponseResult responseResult =
+                responseResultBuilder.build(
+                        motionEvent,
+                        replaySignal,
+                        publishedEvent);
+
+        return responseResult;
     }
 }
