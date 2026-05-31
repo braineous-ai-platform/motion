@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class MotionIngestionResultTest {
+public class MotionResponseResultTest {
 
     @Test
     public void test_1() {
 
-        MotionIngestionResult result = new MotionIngestionResult();
+        MotionResponseResult result = new MotionResponseResult();
 
         result.setResultId("result-1");
         result.setStatus("ACCEPTED");
@@ -34,8 +34,8 @@ public class MotionIngestionResultTest {
 
         result.setMetadataJson("{\"pipeline\":\"motion-ingestion\"}");
 
-        Console.log("ingestionResult", result.toString());
-        Console.log("ingestionResultJson", result.toJson());
+        Console.log("responseResult", result.toString());
+        Console.log("responseResultJson", result.toJson());
 
         assertEquals("result-1", result.getResultId());
         assertEquals("ACCEPTED", result.getStatus());
@@ -62,10 +62,10 @@ public class MotionIngestionResultTest {
     @Test
     public void test_2() {
 
-        MotionIngestionResult result = new MotionIngestionResult();
+        MotionResponseResult result = new MotionResponseResult();
 
-        Console.log("ingestionResult", result.toString());
-        Console.log("ingestionResultJson", result.toJson());
+        Console.log("responseResult", result.toString());
+        Console.log("responseResultJson", result.toJson());
 
         assertNotNull(result.toString());
         assertNotNull(result.toJson());
@@ -74,7 +74,7 @@ public class MotionIngestionResultTest {
     @Test
     public void test_3() {
 
-        MotionIngestionResult result = new MotionIngestionResult();
+        MotionResponseResult result = new MotionResponseResult();
 
         result.setResultId("result-2");
         result.setStatus("QUARANTINED");
@@ -99,11 +99,12 @@ public class MotionIngestionResultTest {
 
         String json = result.toJson();
 
-        Console.log("ingestionResultJson", json);
+        Console.log("responseResultJson", json);
 
-        MotionIngestionResult restored = MotionIngestionResult.fromJson(json, MotionIngestionResult.class);
+        MotionResponseResult restored =
+                MotionResponseResult.fromJson(json, MotionResponseResult.class);
 
-        Console.log("restoredIngestionResult", restored.toString());
+        Console.log("restoredResponseResult", restored.toString());
 
         assertEquals("result-2", restored.getResultId());
         assertEquals("QUARANTINED", restored.getStatus());

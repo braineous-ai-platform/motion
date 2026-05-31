@@ -3,22 +3,17 @@ package ai.braineous.motion.ingestion.eventprocessor.model;
 import io.braineous.motion.core.model.MotionBaseModel;
 
 /**
- * MotionIngestionResult represents the deterministic outcome produced
- * by the Motion ingestion pipeline after validation and routing decisions.
+ * MotionResponseResult represents the deterministic response produced
+ * by the Motion ingestion pipeline after validation, normalization,
+ * replay evaluation, and publication.
  *
  * <p>
- * This object communicates whether an inbound event was:
+ * This object communicates the caller-facing outcome of an inbound
+ * Motion ingestion request.
  * </p>
  *
- * <ul>
- *     <li>Accepted</li>
- *     <li>Rejected</li>
- *     <li>Quarantined</li>
- *     <li>Marked replayable</li>
- * </ul>
- *
  * <p>
- * MotionIngestionResult exists primarily for:
+ * MotionResponseResult exists primarily for:
  * </p>
  *
  * <ul>
@@ -30,24 +25,12 @@ import io.braineous.motion.core.model.MotionBaseModel;
  * </ul>
  *
  * <p>
- * The ingestion result intentionally avoids business interpretation.
- * It communicates ingestion state only.
+ * The response result intentionally avoids business interpretation.
+ * It communicates Motion ingestion state only.
  * </p>
  *
  * <p>
- * Typical ingestion outcome metadata may include:
- * </p>
- *
- * <ul>
- *     <li>Reason codes</li>
- *     <li>Correlation identifiers</li>
- *     <li>Motion event identifiers</li>
- *     <li>Replay eligibility</li>
- *     <li>Pipeline stage outcomes</li>
- * </ul>
- *
- * <p>
- * MotionIngestionResult is designed to remain stable across:
+ * MotionResponseResult is designed to remain stable across:
  * </p>
  *
  * <ul>
@@ -57,10 +40,10 @@ import io.braineous.motion.core.model.MotionBaseModel;
  * </ul>
  *
  * <p>
- * It represents ingestion truth only.
+ * It represents ingestion response truth only.
  * </p>
  */
-public class MotionIngestionResult extends MotionBaseModel {
+public class MotionResponseResult extends MotionBaseModel {
 
     private String resultId;
     private String status;
@@ -83,7 +66,7 @@ public class MotionIngestionResult extends MotionBaseModel {
 
     private String metadataJson;
 
-    public MotionIngestionResult() {
+    public MotionResponseResult() {
     }
 
     public String getResultId() {
@@ -212,27 +195,5 @@ public class MotionIngestionResult extends MotionBaseModel {
 
     public void setMetadataJson(String metadataJson) {
         this.metadataJson = metadataJson;
-    }
-
-    @Override
-    public String toString() {
-        return "MotionIngestionResult{" +
-                "resultId='" + resultId + '\'' +
-                ", status='" + status + '\'' +
-                ", reasonCode='" + reasonCode + '\'' +
-                ", message='" + message + '\'' +
-                ", rawEventId='" + rawEventId + '\'' +
-                ", envelopeId='" + envelopeId + '\'' +
-                ", motionEventId='" + motionEventId + '\'' +
-                ", correlationId='" + correlationId + '\'' +
-                ", traceId='" + traceId + '\'' +
-                ", targetTopic='" + targetTopic + '\'' +
-                ", partitionKey='" + partitionKey + '\'' +
-                ", rawEventJson='" + rawEventJson + '\'' +
-                ", envelopeJson='" + envelopeJson + '\'' +
-                ", motionEventJson='" + motionEventJson + '\'' +
-                ", replaySignalJson='" + replaySignalJson + '\'' +
-                ", metadataJson='" + metadataJson + '\'' +
-                '}';
     }
 }
