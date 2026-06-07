@@ -17,17 +17,14 @@ public class MongoMotionHappeningStoreIT {
     @Inject
     MongoClient mongoClient;
 
+    @Inject
+    MongoMotionHappeningStore store;
+
     @Test
     void test_1_addRecord_and_findByRoutingKey_and_getAll_roundtrip() {
 
         String dbName = "motion_it";
         String collection = "motion_happening_roundtrip";
-
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -72,11 +69,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_null_noop";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -93,11 +85,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_find_null_routing";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -119,11 +106,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_find_blank_routing";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -145,11 +127,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_find_trimmed_routing";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -182,11 +159,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_find_null_frame";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -208,11 +180,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_find_blank_frame";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -234,11 +201,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_find_trimmed_frame";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -270,11 +232,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_multiple_records";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -320,11 +277,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_mixed_subjects";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -386,11 +338,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_subject_null_blank";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -433,11 +380,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_clear";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 
@@ -468,45 +410,7 @@ public class MongoMotionHappeningStoreIT {
                 store.getAll().size());
     }
 
-    @Test
-    void test_13_ctor_invalidArgs_failFast() {
 
-        assertThrows(
-                IllegalArgumentException.class,
-                new org.junit.jupiter.api.function.Executable() {
-                    @Override
-                    public void execute() {
-                        new MongoMotionHappeningStore(
-                                null,
-                                "db",
-                                "collection");
-                    }
-                });
-
-        assertThrows(
-                IllegalArgumentException.class,
-                new org.junit.jupiter.api.function.Executable() {
-                    @Override
-                    public void execute() {
-                        new MongoMotionHappeningStore(
-                                mongoClient,
-                                "   ",
-                                "collection");
-                    }
-                });
-
-        assertThrows(
-                IllegalArgumentException.class,
-                new org.junit.jupiter.api.function.Executable() {
-                    @Override
-                    public void execute() {
-                        new MongoMotionHappeningStore(
-                                mongoClient,
-                                "db",
-                                "   ");
-                    }
-                });
-    }
 
     @Test
     void test_14_roundtrip_preservesNestedMotionFrame() {
@@ -514,11 +418,6 @@ public class MongoMotionHappeningStoreIT {
         String dbName = "motion_it";
         String collection = "motion_happening_nested_frame";
 
-        MongoMotionHappeningStore store =
-                new MongoMotionHappeningStore(
-                        mongoClient,
-                        dbName,
-                        collection);
 
         store.clear();
 

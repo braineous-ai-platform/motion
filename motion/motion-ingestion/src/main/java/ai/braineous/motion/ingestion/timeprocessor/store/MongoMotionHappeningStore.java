@@ -6,6 +6,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -13,12 +15,15 @@ import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
+@Singleton
 public class MongoMotionHappeningStore implements MotionHappeningStore {
 
     public static final String DEFAULT_DB_NAME = "motion";
     public static final String DEFAULT_COLLECTION_NAME = "motion_happening_store";
 
-    private MongoClient mongoClient;
+    @Inject
+    MongoClient mongoClient;
+
     private String dbName;
     private String collectionName;
     private Gson gson;
@@ -26,43 +31,10 @@ public class MongoMotionHappeningStore implements MotionHappeningStore {
     public MongoMotionHappeningStore() {
         this.dbName = DEFAULT_DB_NAME;
         this.collectionName = DEFAULT_COLLECTION_NAME;
-        this.mongoClient = MongoClients.create("mongodb://localhost:27017");
         this.gson = new Gson();
     }
 
-    public MongoMotionHappeningStore(MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
-        this.dbName = DEFAULT_DB_NAME;
-        this.collectionName = DEFAULT_COLLECTION_NAME;
-        this.gson = new Gson();
-    }
-
-    public MongoMotionHappeningStore(
-            MongoClient mongoClient,
-            String dbName,
-            String collectionName) {
-
-        if (mongoClient == null) {
-            throw new IllegalArgumentException("mongoClient cannot be null");
-        }
-
-        if (dbName == null || dbName.trim().isEmpty()) {
-            throw new IllegalArgumentException("dbName cannot be null/empty");
-        }
-
-        if (collectionName == null || collectionName.trim().isEmpty()) {
-            throw new IllegalArgumentException("collectionName cannot be null/empty");
-        }
-
-        this.mongoClient = mongoClient;
-        this.dbName = dbName;
-        this.collectionName = collectionName;
-        this.gson = new Gson();
-    }
-
-    public void setMongoClient(MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
-    }
+    //---------------------------------
 
     @Override
     public void addRecord(MotionHappeningRecord record) {
