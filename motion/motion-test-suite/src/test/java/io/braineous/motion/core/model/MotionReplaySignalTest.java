@@ -1,6 +1,7 @@
-package ai.braineous.motion.ingestion.eventprocessor.model;
+package io.braineous.motion.core.model;
 
 import ai.braineous.rag.prompt.observe.Console;
+import io.braineous.motion.core.model.MotionReplaySignal;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

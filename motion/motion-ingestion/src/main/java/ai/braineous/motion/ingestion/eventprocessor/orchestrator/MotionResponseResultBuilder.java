@@ -1,7 +1,7 @@
 package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
 
 import ai.braineous.motion.ingestion.eventprocessor.model.MotionResponseResult;
-import ai.braineous.motion.ingestion.eventprocessor.model.MotionReplaySignal;
+import io.braineous.motion.core.model.MotionReplaySignal;
 import io.braineous.motion.core.model.MotionEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 

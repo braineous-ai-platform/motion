@@ -1,6 +1,6 @@
 package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
 
-import ai.braineous.motion.ingestion.eventprocessor.model.MotionReplaySignal;
+import io.braineous.motion.core.model.MotionReplaySignal;
 import ai.braineous.motion.ingestion.eventprocessor.model.MotionResponseResult;
 import ai.braineous.rag.prompt.observe.Console;
 import io.braineous.motion.core.model.MotionEvent;

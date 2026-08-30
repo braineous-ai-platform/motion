@@ -1,6 +1,6 @@
-package ai.braineous.motion.intelligence.model;
+package io.braineous.motion.core.model;
 
-import ai.braineous.motion.ingestion.intelligence.model.OperationalSignal;
+import io.braineous.motion.core.model.OperationalSignal;
 import ai.braineous.rag.prompt.observe.Console;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

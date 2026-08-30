@@ -52,7 +52,7 @@ package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
  * </p>
  */
 import ai.braineous.motion.ingestion.eventprocessor.model.MotionEnvelope;
-import ai.braineous.motion.ingestion.eventprocessor.model.MotionReplaySignal;
+import io.braineous.motion.core.model.MotionReplaySignal;
 import ai.braineous.motion.ingestion.eventprocessor.model.MotionResponseResult;
 import io.braineous.motion.core.model.MotionEvent;
 import jakarta.enterprise.context.ApplicationScoped;

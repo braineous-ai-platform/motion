@@ -1,4 +1,4 @@
-package ai.braineous.motion.ingestion.eventprocessor.model;
+package io.braineous.motion.core.model;
 
 import io.braineous.motion.core.model.MotionBaseModel;
 
