@@ -26,6 +26,7 @@ public class MotionEvent extends MotionBaseModel{
     private String operation;
     private String payloadJson;
     private String metadataJson;
+    private MotionReplaySignal replaySignal;
 
     public MotionEvent() {
     }
@@ -94,6 +95,14 @@ public class MotionEvent extends MotionBaseModel{
         this.metadataJson = metadataJson;
     }
 
+    public MotionReplaySignal getReplaySignal() {
+        return replaySignal;
+    }
+
+    public void setReplaySignal(MotionReplaySignal replaySignal) {
+        this.replaySignal = replaySignal;
+    }
+
     //-------------------------------------------
     @Override
     public String toString() {
@@ -106,6 +115,7 @@ public class MotionEvent extends MotionBaseModel{
                 ", operation='" + operation + '\'' +
                 ", payloadJson='" + payloadJson + '\'' +
                 ", metadataJson='" + metadataJson + '\'' +
+                ", replaySignal=" + replaySignal +
                 '}';
     }
 

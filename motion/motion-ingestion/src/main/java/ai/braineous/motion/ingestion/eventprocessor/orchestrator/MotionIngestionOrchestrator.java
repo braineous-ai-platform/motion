@@ -91,6 +91,8 @@ public class MotionIngestionOrchestrator {
         MotionReplaySignal replaySignal =
                 replayOrchestrator.evaluate(motionEvent);
 
+        motionEvent.setReplaySignal(replaySignal);
+
         MotionEvent publishedEvent =
                 eventPublisher.publish(motionEvent);
 

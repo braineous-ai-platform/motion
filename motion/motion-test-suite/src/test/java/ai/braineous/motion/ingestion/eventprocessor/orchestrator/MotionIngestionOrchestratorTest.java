@@ -8,6 +8,7 @@ import io.braineous.motion.core.model.MotionEvent;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class MotionIngestionOrchestratorTest {
@@ -80,6 +81,27 @@ public class MotionIngestionOrchestratorTest {
         assertEquals("PAYMENT_CAPTURE_REQUESTED", motionEvent.getOperation());
         assertEquals("{\"paymentId\":\"payment-1001\"}", motionEvent.getPayloadJson());
         assertEquals("{\"tenant\":\"tenant-1\"}", motionEvent.getMetadataJson());
+        assertNotNull(motionEvent.getReplaySignal());
+
+        assertEquals(
+                "FAILURE_RECOVERY",
+                motionEvent.getReplaySignal().getReplayLevel()
+        );
+
+        assertEquals(
+                "REPLAY_NOT_REQUIRED",
+                motionEvent.getReplaySignal().getReasonCode()
+        );
+
+        assertEquals(
+                "Replay is not required for accepted Motion event",
+                motionEvent.getReplaySignal().getMessage()
+        );
+
+        assertEquals(
+                "envelope-1",
+                motionEvent.getReplaySignal().getMotionEventId()
+        );
     }
 
     @Test
