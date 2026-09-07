@@ -51,6 +51,7 @@ package ai.braineous.motion.ingestion.eventprocessor.orchestrator;
  * operate independently after ingestion completes.
  * </p>
  */
+import ai.braineous.motion.ingestion.eventprocessor.infra.kafka.MotionEventEmitter;
 import ai.braineous.motion.ingestion.eventprocessor.model.MotionEnvelope;
 import io.braineous.motion.core.model.MotionReplaySignal;
 import ai.braineous.motion.ingestion.eventprocessor.model.MotionResponseResult;
@@ -71,7 +72,7 @@ public class MotionIngestionOrchestrator {
     MotionReplayOrchestrator replayOrchestrator;
 
     @Inject
-    MotionEventPublisher eventPublisher;
+    MotionEventEmitter motionEventEmitter;
 
     @Inject
     MotionResponseResultBuilder responseResultBuilder;
@@ -93,8 +94,9 @@ public class MotionIngestionOrchestrator {
 
         motionEvent.setReplaySignal(replaySignal);
 
-        MotionEvent publishedEvent =
-                eventPublisher.publish(motionEvent);
+        motionEventEmitter.emit(motionEvent);
+
+        MotionEvent publishedEvent = motionEvent;
 
         MotionResponseResult responseResult =
                 responseResultBuilder.build(
