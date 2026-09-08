@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * EvolvingContext represents the accumulated operational evolution
- * of a system across ordered MotionFrames over time.
+ * EvolvingContext owns the accumulated operational evolution for one routing
+ * continuity during one absolute 24-hour MotionContextWindow. Its inputs are
+ * deterministically placed MotionFrames, and its domain output is the ordered,
+ * duplicate-free frame membership for that context identity and boundary.
  *
  * Unlike static operational state, EvolvingContext continuously
  * evolves as new MotionFrames are introduced into the runtime,
@@ -21,9 +23,9 @@ import java.util.List;
  * EvolvingContext provides continuity of operational movement
  * across time.
  *
- * This allows intelligent systems to reason not only about what
- * operational state currently is, but also how operational state
- * has evolved over time.
+ * EvolvingContext does not calculate temporal placement, define MotionFrame
+ * windows, execute wall-clock lifecycle transitions, persist or recover state,
+ * project CGO state, provide Insights queries, or own Flink execution behavior.
  */
 public class EvolvingContext extends MotionBaseModel {
 
@@ -32,6 +34,7 @@ public class EvolvingContext extends MotionBaseModel {
     private String subjectId;
     private String subjectType;
     private String status;
+    private MotionContextWindow contextWindow;
     private List<MotionFrame> motionFrames;
     private String metadataJson;
 
@@ -79,6 +82,14 @@ public class EvolvingContext extends MotionBaseModel {
         this.status = status;
     }
 
+    public MotionContextWindow getContextWindow() {
+        return contextWindow;
+    }
+
+    public void setContextWindow(MotionContextWindow contextWindow) {
+        this.contextWindow = contextWindow;
+    }
+
     public List<MotionFrame> getMotionFrames() {
         return motionFrames;
     }
@@ -107,6 +118,7 @@ public class EvolvingContext extends MotionBaseModel {
                 ", subjectId='" + subjectId + '\'' +
                 ", subjectType='" + subjectType + '\'' +
                 ", status='" + status + '\'' +
+                ", contextWindow=" + contextWindow +
                 ", motionFrames=" + motionFrames +
                 ", metadataJson='" + metadataJson + '\'' +
                 '}';
