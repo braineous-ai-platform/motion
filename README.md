@@ -100,6 +100,14 @@ Within BraineousAI, runtime query behavior is driven not only by current operati
 
 This allows deterministic runtime structure to exist around continuously evolving operational conditions and inherently non-deterministic reasoning systems.
 
+### Agents and Continuous Context
+
+Agents operate on context. They may consume context, retrieve history, persist memory, call tools, and receive continuously supplied events. Those capabilities do not make continuous operational context an intrinsic property of an agent.
+
+When infrastructure continuously transforms enterprise events through temporal placement into MotionFrames and maintains continuity across those frames as EvolvingContext, that capability belongs to the runtime surrounding the agent. BraineousAI and Motion own this runtime boundary.
+
+An agent can consume evolving context. It cannot be the runtime that makes context continuously evolve.
+
 ## Runtime Query and Reasoning
 
 Within Motion-enabled intelligent systems, runtime queries execute against evolving operational context rather than isolated events or static records.
