@@ -20,7 +20,7 @@ public class TimeProcessorConsumerTest {
         MotionEvent motionEvent = new MotionEvent();
         motionEvent.setEventId("motion-event-1");
         motionEvent.setEventType("ORDER_STATUS_CHANGED");
-        motionEvent.setOccurredAt("2026-09-07T16:30:00Z");
+        motionEvent.setOriginTime("2026-09-07T16:30:00Z");
         motionEvent.setSubjectId("order-1001");
         motionEvent.setSubjectType("ORDER");
         motionEvent.setOperation("UPDATED");
@@ -59,7 +59,7 @@ public class TimeProcessorConsumerTest {
         assertNotNull(capturedMotionEvent);
         assertEquals("motion-event-1", capturedMotionEvent.getEventId());
         assertEquals("ORDER_STATUS_CHANGED", capturedMotionEvent.getEventType());
-        assertEquals("2026-09-07T16:30:00Z", capturedMotionEvent.getOccurredAt());
+        assertEquals("2026-09-07T16:30:00Z", capturedMotionEvent.getOriginTime());
         assertEquals("order-1001", capturedMotionEvent.getSubjectId());
         assertEquals("ORDER", capturedMotionEvent.getSubjectType());
         assertEquals("UPDATED", capturedMotionEvent.getOperation());

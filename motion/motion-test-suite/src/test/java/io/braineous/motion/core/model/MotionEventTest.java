@@ -1,5 +1,6 @@
 package io.braineous.motion.core.model;
 
+import ai.braineous.rag.prompt.observe.Console;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,7 +16,8 @@ public class MotionEventTest {
 
         event.setEventId("event-1");
         event.setEventType("ORDER_STATUS_CHANGED");
-        event.setOccurredAt("2026-05-22T10:15:30Z");
+        event.setOriginTime("2026-05-22T10:15:30Z");
+        event.setReceivedAt("2026-05-22T10:15:35Z");
         event.setSubjectId("order-1001");
         event.setSubjectType("ORDER");
         event.setOperation("UPDATED");
@@ -28,9 +30,12 @@ public class MotionEventTest {
         replaySignal.setMessage("Replay requested for predictive intelligence backtesting");
         event.setReplaySignal(replaySignal);
 
+        Console.log("motionEvent", event.toString());
+
         assertEquals("event-1", event.getEventId());
         assertEquals("ORDER_STATUS_CHANGED", event.getEventType());
-        assertEquals("2026-05-22T10:15:30Z", event.getOccurredAt());
+        assertEquals("2026-05-22T10:15:30Z", event.getOriginTime());
+        assertEquals("2026-05-22T10:15:35Z", event.getReceivedAt());
         assertEquals("order-1001", event.getSubjectId());
         assertEquals("ORDER", event.getSubjectType());
         assertEquals("UPDATED", event.getOperation());
@@ -52,5 +57,41 @@ public class MotionEventTest {
 
         assertNotNull(event.toString());
         assertTrue(event.toString().contains("replaySignal="));
+
+        Console.log("motionEvent", event.toString());
+    }
+
+    @Test
+    public void test_3() {
+        MotionEvent event = new MotionEvent();
+        event.setEventId("event-json-1");
+        event.setOriginTime("2026-05-22T10:15:30Z");
+        event.setReceivedAt("2026-05-22T10:15:35Z");
+        event.setPayloadJson("{\"status\":\"SHIPPED\"}");
+
+        Console.log("motionEvent", "serialize both time axes");
+        String json = event.toJson();
+        MotionEvent restored = MotionEvent.fromJson(json, MotionEvent.class);
+        Console.log("motionEventJson", json);
+
+        assertNotNull(restored);
+        assertEquals("event-json-1", restored.getEventId());
+        assertEquals("2026-05-22T10:15:30Z", restored.getOriginTime());
+        assertEquals("2026-05-22T10:15:35Z", restored.getReceivedAt());
+        assertEquals("{\"status\":\"SHIPPED\"}", restored.getPayloadJson());
+    }
+
+    @Test
+    public void test_4() {
+        MotionEvent event = new MotionEvent();
+
+        Console.log("motionEvent", "serialize null time axes");
+        String json = event.toJson();
+        MotionEvent restored = MotionEvent.fromJson(json, MotionEvent.class);
+        Console.log("motionEventJson", json);
+
+        assertNotNull(restored);
+        org.junit.jupiter.api.Assertions.assertNull(restored.getOriginTime());
+        org.junit.jupiter.api.Assertions.assertNull(restored.getReceivedAt());
     }
 }

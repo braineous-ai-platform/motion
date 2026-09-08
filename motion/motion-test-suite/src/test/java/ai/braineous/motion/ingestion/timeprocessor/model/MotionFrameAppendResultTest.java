@@ -2,6 +2,7 @@ package ai.braineous.motion.ingestion.timeprocessor.model;
 
 import ai.braineous.rag.prompt.observe.Console;
 import io.braineous.motion.core.model.MotionFrame;
+import io.braineous.motion.core.model.MotionTimeWindow;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -13,8 +14,10 @@ public class MotionFrameAppendResultTest {
         MotionFrame motionFrame = new MotionFrame();
         motionFrame.setFrameId("frame-1001");
         motionFrame.setFrameType("CUSTOMER_ACTIVITY");
-        motionFrame.setWindowStart("2026-01-01T10:00:00Z");
-        motionFrame.setWindowEnd("2026-01-01T10:10:00Z");
+        MotionTimeWindow timeWindow = new MotionTimeWindow();
+        timeWindow.setWindowStart("2026-01-01T10:00:00Z");
+        timeWindow.setWindowEnd("2026-01-01T10:10:00Z");
+        motionFrame.setTimeWindow(timeWindow);
         motionFrame.setSequence("1");
         motionFrame.setStatus("ACTIVE");
         motionFrame.setMetadataJson("{\"source\":\"timeprocessor-ut\"}");

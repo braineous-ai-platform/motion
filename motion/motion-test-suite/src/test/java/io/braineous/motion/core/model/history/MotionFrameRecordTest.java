@@ -2,6 +2,7 @@ package io.braineous.motion.core.model.history;
 
 import ai.braineous.rag.prompt.observe.Console;
 import io.braineous.motion.core.model.MotionFrame;
+import io.braineous.motion.core.model.MotionTimeWindow;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -15,8 +16,10 @@ public class MotionFrameRecordTest {
         MotionFrame frame = new MotionFrame();
         frame.setFrameId("frame-1");
         frame.setFrameType("ORDER_OPERATION_FRAME");
-        frame.setWindowStart("2026-05-22T10:00:00Z");
-        frame.setWindowEnd("2026-05-22T10:05:00Z");
+        MotionTimeWindow timeWindow = new MotionTimeWindow();
+        timeWindow.setWindowStart("2026-05-22T10:00:00Z");
+        timeWindow.setWindowEnd("2026-05-22T10:05:00Z");
+        frame.setTimeWindow(timeWindow);
         frame.setSequence("1");
         frame.setStatus("OPEN");
         frame.setMetadataJson("{\"runtime\":\"motion\"}");

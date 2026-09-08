@@ -1,8 +1,9 @@
 package io.braineous.motion.core.model;
 
 /**
- * MotionFrame represents a bounded unit of operational evolution
- * accumulated across a deterministic temporal runtime window.
+ * MotionFrame is Motion's bounded temporal domain frame for one
+ * operational continuity. Its temporal boundary is represented by
+ * MotionTimeWindow.
  *
  * A MotionFrame contains a collection of MotionEvents that together
  * describe meaningful operational movement over time rather than
@@ -13,9 +14,9 @@ package io.braineous.motion.core.model;
  * organized, accumulated, and evolved into higher-order runtime
  * context.
  *
- * The temporal boundary of a MotionFrame is controlled internally
- * by the runtime to preserve deterministic operational semantics
- * across evolving event-native systems.
+ * A MotionFrame owns its accumulated MotionEvents and lifecycle/model
+ * state. It does not define Flink execution mechanics. MotionTimeWindow
+ * represents the boundary; execution policy is defined separately.
  *
  * MotionFrames accumulate into EvolvingContext, allowing intelligent
  * systems to reason against operational evolution rather than
@@ -25,8 +26,7 @@ public class MotionFrame extends MotionBaseModel {
 
     private String frameId;
     private String frameType;
-    private String windowStart;
-    private String windowEnd;
+    private MotionTimeWindow timeWindow;
     private String sequence;
     private String status;
     private java.util.List<MotionEvent> motionEvents;
@@ -52,20 +52,12 @@ public class MotionFrame extends MotionBaseModel {
         this.frameType = frameType;
     }
 
-    public String getWindowStart() {
-        return windowStart;
+    public MotionTimeWindow getTimeWindow() {
+        return timeWindow;
     }
 
-    public void setWindowStart(String windowStart) {
-        this.windowStart = windowStart;
-    }
-
-    public String getWindowEnd() {
-        return windowEnd;
-    }
-
-    public void setWindowEnd(String windowEnd) {
-        this.windowEnd = windowEnd;
+    public void setTimeWindow(MotionTimeWindow timeWindow) {
+        this.timeWindow = timeWindow;
     }
 
     public String getSequence() {
@@ -114,8 +106,7 @@ public class MotionFrame extends MotionBaseModel {
         return "MotionFrame{" +
                 "frameId='" + frameId + '\'' +
                 ", frameType='" + frameType + '\'' +
-                ", windowStart='" + windowStart + '\'' +
-                ", windowEnd='" + windowEnd + '\'' +
+                ", timeWindow=" + timeWindow +
                 ", sequence='" + sequence + '\'' +
                 ", status='" + status + '\'' +
                 ", motionEvents=" + motionEvents +

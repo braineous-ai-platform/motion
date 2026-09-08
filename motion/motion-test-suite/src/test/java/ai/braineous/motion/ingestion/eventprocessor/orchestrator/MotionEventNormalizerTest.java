@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class MotionEventNormalizerTest {
 
@@ -20,7 +21,7 @@ public class MotionEventNormalizerTest {
         rawEvent.setSource("payment-system");
         rawEvent.setSourceType("PAYMENT");
         rawEvent.setEventType("PAYMENT_CAPTURE_REQUESTED");
-        rawEvent.setReceivedAt("2026-01-01T10:15:30Z");
+        rawEvent.setReceivedAt("2026-01-01T10:15:20Z");
         rawEvent.setPayloadJson("{\"paymentId\":\"payment-1001\"}");
         rawEvent.setMetadataJson("{\"source\":\"payment-system\"}");
 
@@ -59,8 +60,12 @@ public class MotionEventNormalizerTest {
                 motionEvent.getEventType());
 
         assertEquals(
+                "2026-01-01T10:15:20Z",
+                motionEvent.getOriginTime());
+
+        assertEquals(
                 "2026-01-01T10:15:30Z",
-                motionEvent.getOccurredAt());
+                motionEvent.getReceivedAt());
 
         assertEquals(
                 "payment-1001",
@@ -98,6 +103,8 @@ public class MotionEventNormalizerTest {
 
         assertNotNull(motionEvent);
         assertNotNull(motionEvent.toJson());
+        assertNull(motionEvent.getOriginTime());
+        assertNull(motionEvent.getReceivedAt());
     }
 
     @Test
@@ -116,6 +123,14 @@ public class MotionEventNormalizerTest {
 
         MotionEvent motionEvent =
                 normalizer.normalize(motionEnvelope);
+
+        assertEquals(
+                "2026-05-01T12:00:00Z",
+                motionEvent.getOriginTime());
+
+        assertEquals(
+                "2026-05-01T12:00:00Z",
+                motionEvent.getReceivedAt());
 
         String json =
                 motionEvent.toJson();
@@ -142,8 +157,12 @@ public class MotionEventNormalizerTest {
                 restored.getEventType());
 
         assertEquals(
-                motionEvent.getOccurredAt(),
-                restored.getOccurredAt());
+                motionEvent.getOriginTime(),
+                restored.getOriginTime());
+
+        assertEquals(
+                motionEvent.getReceivedAt(),
+                restored.getReceivedAt());
 
         assertEquals(
                 motionEvent.getSubjectId(),
@@ -164,5 +183,24 @@ public class MotionEventNormalizerTest {
         assertEquals(
                 motionEvent.getMetadataJson(),
                 restored.getMetadataJson());
+    }
+
+    @Test
+    public void test_4() {
+        RawEvent rawEvent = new RawEvent();
+        rawEvent.setReceivedAt("   ");
+
+        MotionEnvelope motionEnvelope = new MotionEnvelope();
+        motionEnvelope.setReceivedAt("2026-05-01T12:00:00Z");
+        motionEnvelope.setRawEvent(rawEvent);
+
+        MotionEventNormalizer normalizer = new MotionEventNormalizer();
+
+        Console.log("normalization", "blank source origin uses Motion received time");
+        MotionEvent motionEvent = normalizer.normalize(motionEnvelope);
+        Console.log("motionEvent", motionEvent.toJson());
+
+        assertEquals("2026-05-01T12:00:00Z", motionEvent.getOriginTime());
+        assertEquals("2026-05-01T12:00:00Z", motionEvent.getReceivedAt());
     }
 }

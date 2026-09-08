@@ -1,26 +1,23 @@
 package io.braineous.motion.core.model;
 
 /**
- * MotionEvent represents a normalized operational signal participating
- * in temporal operational motion within the Motion runtime.
+ * MotionEvent is the canonical Motion ingestion and runtime event primitive.
+ * It preserves originTime as the source-declared operational occurrence time
+ * and receivedAt as Motion's observation and admission time. Both clocks are
+ * retained because Motion Time-axis semantics require both temporal facts.
+ * When source origin time is absent, normalization assigns receivedAt as the
+ * deterministic originTime fallback.
  *
- * Unlike transport-level events, MotionEvent abstracts operational
- * meaning from underlying event infrastructure and serves as the
- * foundational runtime primitive for operational evolution.
- *
- * MotionEvents are accumulated into MotionFrames across bounded
- * temporal windows, allowing the runtime to reason about operational
- * progression, transition, and evolving context over time.
- *
- * Within Motion, time acts as the primary operational axis through
- * which intelligent runtime behavior emerges from continuously
- * evolving operational state.
+ * Flink may later execute against this Motion-owned model but does not define
+ * it. MotionEvent does not parse timestamps or establish timezone, window,
+ * watermark, lateness, replay-placement, or frame-lifecycle policy.
  */
-public class MotionEvent extends MotionBaseModel{
+public class MotionEvent extends MotionBaseModel {
 
     private String eventId;
     private String eventType;
-    private String occurredAt;
+    private String originTime;
+    private String receivedAt;
     private String subjectId;
     private String subjectType;
     private String operation;
@@ -47,12 +44,20 @@ public class MotionEvent extends MotionBaseModel{
         this.eventType = eventType;
     }
 
-    public String getOccurredAt() {
-        return occurredAt;
+    public String getOriginTime() {
+        return originTime;
     }
 
-    public void setOccurredAt(String occurredAt) {
-        this.occurredAt = occurredAt;
+    public void setOriginTime(String originTime) {
+        this.originTime = originTime;
+    }
+
+    public String getReceivedAt() {
+        return receivedAt;
+    }
+
+    public void setReceivedAt(String receivedAt) {
+        this.receivedAt = receivedAt;
     }
 
     public String getSubjectId() {
@@ -109,7 +114,8 @@ public class MotionEvent extends MotionBaseModel{
         return "MotionEvent{" +
                 "eventId='" + eventId + '\'' +
                 ", eventType='" + eventType + '\'' +
-                ", occurredAt='" + occurredAt + '\'' +
+                ", originTime='" + originTime + '\'' +
+                ", receivedAt='" + receivedAt + '\'' +
                 ", subjectId='" + subjectId + '\'' +
                 ", subjectType='" + subjectType + '\'' +
                 ", operation='" + operation + '\'' +

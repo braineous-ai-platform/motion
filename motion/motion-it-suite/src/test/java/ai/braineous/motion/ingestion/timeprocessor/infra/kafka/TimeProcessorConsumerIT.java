@@ -11,21 +11,29 @@ import io.quarkus.test.junit.TestProfile;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.ConsumerGroupDescription;
+import org.apache.kafka.clients.admin.MemberDescription;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 @TestProfile(TimeProcessorConsumerIT.Profile.class)
@@ -37,6 +45,9 @@ public class TimeProcessorConsumerIT {
     @Inject
     RecordingTimeProcessorOrchestrator orchestrator;
 
+    @ConfigProperty(name = "mp.messaging.incoming.motion-event-in.group.id")
+    String consumerGroupId;
+
     @Test
     public void test_1() throws Exception {
         Console.log("Quarkus/Kafka runtime ready", "real incoming connector is active");
@@ -44,11 +55,14 @@ public class TimeProcessorConsumerIT {
         String motionEventId = "time-processor-consumer-it-" + UUID.randomUUID();
 
         orchestrator.reset(motionEventId);
+        awaitConsumerAssignment();
+
+        Console.log("Kafka consumer ready", consumerGroupId);
 
         MotionEvent motionEvent = new MotionEvent();
         motionEvent.setEventId(motionEventId);
         motionEvent.setEventType("ORDER_STATUS_CHANGED");
-        motionEvent.setOccurredAt("2026-09-07T18:00:00Z");
+        motionEvent.setOriginTime("2026-09-07T18:00:00Z");
         motionEvent.setSubjectId("order-consumer-it-1001");
         motionEvent.setSubjectType("ORDER");
         motionEvent.setOperation("UPDATED");
@@ -94,12 +108,7 @@ public class TimeProcessorConsumerIT {
 
         Console.log("waiting for consumer", motionEventId);
 
-        long deadline = System.nanoTime() + Duration.ofSeconds(20).toNanos();
-
-        while (!orchestrator.hasReceived(motionEventId)
-                && System.nanoTime() < deadline) {
-            Thread.sleep(50L);
-        }
+        boolean received = orchestrator.awaitReceived(20L, TimeUnit.SECONDS);
 
         MotionEvent capturedMotionEvent = orchestrator.getCapturedMotionEvent();
 
@@ -108,11 +117,12 @@ public class TimeProcessorConsumerIT {
                 String.valueOf(orchestrator.getInvocationCount()));
         Console.log("captured event inspected", String.valueOf(capturedMotionEvent));
 
+        assertTrue(received);
         assertEquals(1, orchestrator.getInvocationCount());
         assertNotNull(capturedMotionEvent);
         assertEquals(motionEventId, capturedMotionEvent.getEventId());
         assertEquals("ORDER_STATUS_CHANGED", capturedMotionEvent.getEventType());
-        assertEquals("2026-09-07T18:00:00Z", capturedMotionEvent.getOccurredAt());
+        assertEquals("2026-09-07T18:00:00Z", capturedMotionEvent.getOriginTime());
         assertEquals("order-consumer-it-1001", capturedMotionEvent.getSubjectId());
         assertEquals("ORDER", capturedMotionEvent.getSubjectType());
         assertEquals("UPDATED", capturedMotionEvent.getOperation());
@@ -136,6 +146,42 @@ public class TimeProcessorConsumerIT {
         Console.log("assertions complete", motionEventId);
     }
 
+    private void awaitConsumerAssignment() throws Exception {
+        Properties adminProperties = new Properties();
+        adminProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
+
+        AdminClient adminClient = AdminClient.create(adminProperties);
+
+        try {
+            boolean assigned = false;
+            long deadline = System.nanoTime() + Duration.ofSeconds(20).toNanos();
+
+            while (!assigned && System.nanoTime() < deadline) {
+                Map<String, ConsumerGroupDescription> descriptions =
+                        adminClient.describeConsumerGroups(
+                                        Collections.singleton(consumerGroupId))
+                                .all()
+                                .get(2L, TimeUnit.SECONDS);
+
+                ConsumerGroupDescription description =
+                        descriptions.get(consumerGroupId);
+
+                if (description != null) {
+                    for (MemberDescription member : description.members()) {
+                        if (!member.assignment().topicPartitions().isEmpty()) {
+                            assigned = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            assertTrue(assigned);
+        } finally {
+            adminClient.close(Duration.ofSeconds(5));
+        }
+    }
+
     public static class Profile implements QuarkusTestProfile {
 
         @Override
@@ -152,6 +198,7 @@ class RecordingTimeProcessorOrchestrator extends TimeProcessorOrchestrator {
     private final AtomicInteger invocationCount = new AtomicInteger();
     private volatile MotionEvent capturedMotionEvent;
     private volatile String expectedMotionEventId;
+    private volatile CountDownLatch receivedLatch = new CountDownLatch(1);
 
     @Override
     public MotionProcessorResult process(MotionEvent motionEvent) {
@@ -169,6 +216,7 @@ class RecordingTimeProcessorOrchestrator extends TimeProcessorOrchestrator {
 
         capturedMotionEvent = motionEvent;
         invocationCount.incrementAndGet();
+        receivedLatch.countDown();
         return null;
     }
 
@@ -176,16 +224,13 @@ class RecordingTimeProcessorOrchestrator extends TimeProcessorOrchestrator {
         this.expectedMotionEventId = expectedMotionEventId;
         capturedMotionEvent = null;
         invocationCount.set(0);
+        receivedLatch = new CountDownLatch(1);
     }
 
-    public boolean hasReceived(String motionEventId) {
-        MotionEvent current = capturedMotionEvent;
-
-        if (current == null) {
-            return false;
-        }
-
-        return motionEventId.equals(current.getEventId());
+    public boolean awaitReceived(
+            long timeout,
+            TimeUnit timeUnit) throws InterruptedException {
+        return receivedLatch.await(timeout, timeUnit);
     }
 
     public MotionEvent getCapturedMotionEvent() {

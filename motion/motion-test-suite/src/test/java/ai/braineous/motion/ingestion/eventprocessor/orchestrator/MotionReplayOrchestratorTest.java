@@ -17,7 +17,7 @@ public class MotionReplayOrchestratorTest {
 
         motionEvent.setEventId("motion-event-1");
         motionEvent.setEventType("PAYMENT_CAPTURE_REQUESTED");
-        motionEvent.setOccurredAt("2026-01-01T10:15:30Z");
+        motionEvent.setOriginTime("2026-01-01T10:15:30Z");
         motionEvent.setSubjectId("payment-1001");
         motionEvent.setSubjectType("PAYMENT");
         motionEvent.setOperation("CAPTURE");
@@ -105,7 +105,7 @@ public class MotionReplayOrchestratorTest {
 
         motionEvent.setEventId("motion-event-2");
         motionEvent.setEventType("ORDER_CREATED");
-        motionEvent.setOccurredAt("2026-05-01T12:00:00Z");
+        motionEvent.setOriginTime("2026-05-01T12:00:00Z");
         motionEvent.setMetadataJson("{\"tenant\":\"tenant-1\"}");
 
         MotionReplayOrchestrator orchestrator =

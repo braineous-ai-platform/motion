@@ -84,7 +84,7 @@ public class MotionIngestionOrchestratorTest {
         assertSame(replayOrchestrator.getReplaySignal(), emittedMotionEvent.getReplaySignal());
         assertEquals("envelope-1", emittedMotionEvent.getEventId());
         assertEquals("PAYMENT_CAPTURE_REQUESTED", emittedMotionEvent.getEventType());
-        assertEquals("2026-01-01T10:15:30Z", emittedMotionEvent.getOccurredAt());
+        assertEquals("2026-01-01T10:15:30Z", emittedMotionEvent.getOriginTime());
         assertEquals("payment-1001", emittedMotionEvent.getSubjectId());
         assertEquals("PAYMENT", emittedMotionEvent.getSubjectType());
         assertEquals("PAYMENT_CAPTURE_REQUESTED", emittedMotionEvent.getOperation());
@@ -111,7 +111,7 @@ public class MotionIngestionOrchestratorTest {
 
         assertEquals("envelope-1", motionEvent.getEventId());
         assertEquals("PAYMENT_CAPTURE_REQUESTED", motionEvent.getEventType());
-        assertEquals("2026-01-01T10:15:30Z", motionEvent.getOccurredAt());
+        assertEquals("2026-01-01T10:15:30Z", motionEvent.getOriginTime());
         assertEquals("payment-1001", motionEvent.getSubjectId());
         assertEquals("PAYMENT", motionEvent.getSubjectType());
         assertEquals("PAYMENT_CAPTURE_REQUESTED", motionEvent.getOperation());

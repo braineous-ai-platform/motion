@@ -203,7 +203,7 @@ public class TimeProcessorOrchestratorIT {
 
         event.setEventId(eventId);
         event.setEventType("ORDER_UPDATED");
-        event.setOccurredAt("2026-06-06T12:00:00Z");
+        event.setOriginTime("2026-06-06T12:00:00Z");
 
         event.setSubjectId(subjectId);
         event.setSubjectType("ORDER");

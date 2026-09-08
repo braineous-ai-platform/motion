@@ -189,7 +189,7 @@ public class MotionFrameRoutingKeyResolverTest {
         MotionEvent event = new MotionEvent();
         event.setEventId("event-1");
         event.setEventType("ORDER_UPDATED");
-        event.setOccurredAt("2026-06-06T12:00:00Z");
+        event.setOriginTime("2026-06-06T12:00:00Z");
         event.setSubjectId(subjectId);
         event.setSubjectType(subjectType);
         event.setOperation("UPDATE");

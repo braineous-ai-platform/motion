@@ -6,51 +6,14 @@ import io.braineous.motion.core.model.MotionEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 
 /**
- * MotionEventNormalizer transforms inbound ingestion artifacts into
- * Motion's canonical event representation.
+ * MotionEventNormalizer owns deterministic normalization of inbound artifacts
+ * into the canonical MotionEvent. It preserves supplied source temporal truth
+ * as originTime, supplies Motion-known envelope received time as receivedAt,
+ * and applies the receivedAt fallback only when source origin time is absent.
  *
- * <p>
- * MotionEventNormalizer is responsible for converting source-specific
- * event structures into a normalized MotionEvent that can be processed
- * consistently throughout the Motion runtime.
- * </p>
- *
- * <p>
- * The normalizer establishes Motion's canonical event boundary by
- * elevating inbound ingestion artifacts into a standardized event
- * representation.
- * </p>
- *
- * <p>
- * Typical normalization responsibilities include:
- * </p>
- *
- * <ul>
- *     <li>Reading RawEvent content</li>
- *     <li>Reading MotionEnvelope metadata</li>
- *     <li>Constructing MotionEvent identifiers</li>
- *     <li>Mapping source event metadata</li>
- *     <li>Producing canonical MotionEvent instances</li>
- * </ul>
- *
- * <p>
- * MotionEventNormalizer intentionally avoids:
- * </p>
- *
- * <ul>
- *     <li>Validation decisions</li>
- *     <li>Replay evaluation</li>
- *     <li>Event publication</li>
- *     <li>Persistence operations</li>
- *     <li>Business-domain interpretation</li>
- *     <li>Temporal intelligence calculations</li>
- * </ul>
- *
- * <p>
- * MotionEventNormalizer focuses solely on canonical event creation.
- * The resulting MotionEvent becomes the authoritative event model
- * used by downstream Motion processing stages.
- * </p>
+ * The normalizer does not implement Flink temporal mechanics, timestamp
+ * parsing, window calculation, watermarking, lateness, replay placement, or
+ * frame lifecycle policy.
  */
 @ApplicationScoped
 public class MotionEventNormalizer {
@@ -65,6 +28,7 @@ public class MotionEventNormalizer {
 
         applyEnvelopeFields(motionEvent, motionEnvelope);
         applyRawEventFields(motionEvent, motionEnvelope.getRawEvent());
+        applyOriginTimeFallback(motionEvent);
 
         return motionEvent;
     }
@@ -74,7 +38,7 @@ public class MotionEventNormalizer {
             MotionEnvelope motionEnvelope) {
 
         motionEvent.setEventId(motionEnvelope.getEnvelopeId());
-        motionEvent.setOccurredAt(motionEnvelope.getReceivedAt());
+        motionEvent.setReceivedAt(motionEnvelope.getReceivedAt());
         motionEvent.setSubjectId(motionEnvelope.getCorrelationId());
         motionEvent.setMetadataJson(motionEnvelope.getMetadataJson());
     }
@@ -88,8 +52,22 @@ public class MotionEventNormalizer {
         }
 
         motionEvent.setEventType(rawEvent.getEventType());
+        motionEvent.setOriginTime(rawEvent.getReceivedAt());
         motionEvent.setSubjectType(rawEvent.getSourceType());
         motionEvent.setOperation(rawEvent.getEventType());
         motionEvent.setPayloadJson(rawEvent.getPayloadJson());
+    }
+
+    private void applyOriginTimeFallback(MotionEvent motionEvent) {
+        String originTime = motionEvent.getOriginTime();
+
+        if (originTime == null) {
+            motionEvent.setOriginTime(motionEvent.getReceivedAt());
+            return;
+        }
+
+        if (originTime.trim().isEmpty()) {
+            motionEvent.setOriginTime(motionEvent.getReceivedAt());
+        }
     }
 }

@@ -31,7 +31,7 @@ public class MotionEventEmitterTest {
         MotionEvent motionEvent = new MotionEvent();
         motionEvent.setEventId("motion-event-1");
         motionEvent.setEventType("ORDER_STATUS_CHANGED");
-        motionEvent.setOccurredAt("2026-05-22T10:15:30Z");
+        motionEvent.setOriginTime("2026-05-22T10:15:30Z");
         motionEvent.setSubjectId("order-1001");
         motionEvent.setSubjectType("ORDER");
         motionEvent.setOperation("UPDATED");
@@ -100,7 +100,7 @@ public class MotionEventEmitterTest {
 
         assertEquals("motion-event-1", restoredMotionEvent.getEventId());
         assertEquals("ORDER_STATUS_CHANGED", restoredMotionEvent.getEventType());
-        assertEquals("2026-05-22T10:15:30Z", restoredMotionEvent.getOccurredAt());
+        assertEquals("2026-05-22T10:15:30Z", restoredMotionEvent.getOriginTime());
         assertEquals("order-1001", restoredMotionEvent.getSubjectId());
         assertEquals("ORDER", restoredMotionEvent.getSubjectType());
         assertEquals("UPDATED", restoredMotionEvent.getOperation());

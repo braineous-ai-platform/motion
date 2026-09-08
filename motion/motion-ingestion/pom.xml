@@ -38,6 +38,10 @@
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-core-api</artifactId>
+    </dependency>
     <!-- CGO (Causal Graph Orchestrator -->
     <dependency>
       <groupId>io.github.braineous-ai-platform</groupId>

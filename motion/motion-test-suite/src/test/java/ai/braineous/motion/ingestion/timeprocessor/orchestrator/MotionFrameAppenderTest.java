@@ -313,7 +313,7 @@ public class MotionFrameAppenderTest {
 
         event.setEventId(eventId);
         event.setEventType("ORDER_UPDATED");
-        event.setOccurredAt("2026-06-06T12:00:00Z");
+        event.setOriginTime("2026-06-06T12:00:00Z");
         event.setSubjectId("ORDER-1001");
         event.setSubjectType("ORDER");
         event.setOperation("UPDATE");

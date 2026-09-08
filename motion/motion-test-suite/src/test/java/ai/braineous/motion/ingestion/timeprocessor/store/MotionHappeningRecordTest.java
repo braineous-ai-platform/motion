@@ -1,6 +1,7 @@
 package ai.braineous.motion.ingestion.timeprocessor.store;
 
 import io.braineous.motion.core.model.MotionFrame;
+import io.braineous.motion.core.model.MotionTimeWindow;
 import ai.braineous.rag.prompt.observe.Console;
 import org.junit.jupiter.api.Test;
 
@@ -88,8 +89,10 @@ public class MotionHappeningRecordTest {
         MotionFrame frame = new MotionFrame();
         frame.setFrameId("frame-1");
         frame.setFrameType("ORDER_OPERATION_FRAME");
-        frame.setWindowStart("2026-06-06T10:00:00Z");
-        frame.setWindowEnd("2026-06-06T10:05:00Z");
+        MotionTimeWindow timeWindow = new MotionTimeWindow();
+        timeWindow.setWindowStart("2026-06-06T10:00:00Z");
+        timeWindow.setWindowEnd("2026-06-06T10:05:00Z");
+        frame.setTimeWindow(timeWindow);
         frame.setSequence("1");
         frame.setStatus("OPEN");
 
@@ -102,8 +105,9 @@ public class MotionHappeningRecordTest {
         assertNotNull(record.getMotionFrame());
         assertEquals("frame-1", record.getMotionFrame().getFrameId());
         assertEquals("ORDER_OPERATION_FRAME", record.getMotionFrame().getFrameType());
-        assertEquals("2026-06-06T10:00:00Z", record.getMotionFrame().getWindowStart());
-        assertEquals("2026-06-06T10:05:00Z", record.getMotionFrame().getWindowEnd());
+        assertNotNull(record.getMotionFrame().getTimeWindow());
+        assertEquals("2026-06-06T10:00:00Z", record.getMotionFrame().getTimeWindow().getWindowStart());
+        assertEquals("2026-06-06T10:05:00Z", record.getMotionFrame().getTimeWindow().getWindowEnd());
         assertEquals("1", record.getMotionFrame().getSequence());
         assertEquals("OPEN", record.getMotionFrame().getStatus());
     }

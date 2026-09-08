@@ -4,6 +4,8 @@ import ai.braineous.motion.ingestion.timeprocessor.model.MotionFrameRoutingKey;
 import io.braineous.motion.core.model.MotionEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.io.Serializable;
+
 /**
  * MotionFrameRoutingKeyResolver derives the deterministic routing
  * identity used by the TimeProcessor runtime to locate the active
@@ -23,6 +25,12 @@ import jakarta.enterprise.context.ApplicationScoped;
  * the same MotionEvent subject identity produces the same routing
  * identity.
  *
+ * The resolver is stateless and serializable so the same Motion-owned
+ * routing computation can participate in distributed execution
+ * environments. Serializability does not transfer ownership of routing
+ * semantics to any execution framework. This resolver does not own
+ * partition execution, windows, temporal state, persistence, or sinks.
+ *
  * Current routing identity format:
  *
  * subjectId:subjectType:frameType
@@ -36,7 +44,9 @@ import jakarta.enterprise.context.ApplicationScoped;
  * ORDER-1001:ORDER:ORDER_OPERATION_FRAME
  */
 @ApplicationScoped
-public class MotionFrameRoutingKeyResolver {
+public class MotionFrameRoutingKeyResolver implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public MotionFrameRoutingKey resolve(MotionEvent motionEvent) {
 

@@ -118,11 +118,13 @@ public class TimeProcessorOrchestrator {
         record.setFrameType(
                 safe(frame.getFrameType()));
 
-        record.setWindowStart(
-                frame.getWindowStart());
+        if (frame.getTimeWindow() != null) {
+            record.setWindowStart(
+                    frame.getTimeWindow().getWindowStart());
 
-        record.setWindowEnd(
-                frame.getWindowEnd());
+            record.setWindowEnd(
+                    frame.getTimeWindow().getWindowEnd());
+        }
 
         record.setSequence(
                 frame.getSequence());

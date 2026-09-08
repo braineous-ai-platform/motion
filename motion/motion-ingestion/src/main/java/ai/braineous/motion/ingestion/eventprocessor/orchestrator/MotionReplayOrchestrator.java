@@ -65,9 +65,9 @@ public class MotionReplayOrchestrator {
         if (motionEvent != null) {
             replaySignal.setMotionEventId(motionEvent.getEventId());
             replaySignal.setEventType(motionEvent.getEventType());
-            replaySignal.setReplayFromTime(motionEvent.getOccurredAt());
-            replaySignal.setReplayToTime(motionEvent.getOccurredAt());
-            replaySignal.setAsOfTime(motionEvent.getOccurredAt());
+            replaySignal.setReplayFromTime(motionEvent.getOriginTime());
+            replaySignal.setReplayToTime(motionEvent.getOriginTime());
+            replaySignal.setAsOfTime(motionEvent.getOriginTime());
             replaySignal.setMotionEventJson(motionEvent.toJson());
             replaySignal.setMetadataJson(motionEvent.getMetadataJson());
         }

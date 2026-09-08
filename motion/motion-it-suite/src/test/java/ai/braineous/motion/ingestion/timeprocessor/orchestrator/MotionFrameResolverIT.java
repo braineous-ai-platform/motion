@@ -5,6 +5,7 @@ import ai.braineous.motion.ingestion.timeprocessor.store.MotionHappeningRecord;
 import ai.braineous.motion.ingestion.timeprocessor.store.MotionHappeningStore;
 import ai.braineous.rag.prompt.observe.Console;
 import io.braineous.motion.core.model.MotionFrame;
+import io.braineous.motion.core.model.MotionTimeWindow;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
@@ -249,8 +250,10 @@ public class MotionFrameResolverIT {
 
         frame.setFrameId(frameId);
         frame.setFrameType("ORDER_OPERATION_FRAME");
-        frame.setWindowStart("2026-05-22T10:00:00Z");
-        frame.setWindowEnd("2026-05-22T10:05:00Z");
+        MotionTimeWindow timeWindow = new MotionTimeWindow();
+        timeWindow.setWindowStart("2026-05-22T10:00:00Z");
+        timeWindow.setWindowEnd("2026-05-22T10:05:00Z");
+        frame.setTimeWindow(timeWindow);
         frame.setSequence("1");
         frame.setStatus("OPEN");
         frame.setMetadataJson("{\"runtime\":\"motion\"}");

@@ -3,10 +3,12 @@ package ai.braineous.motion.ingestion.timeprocessor.store;
 import ai.braineous.rag.prompt.observe.Console;
 import com.mongodb.client.MongoClient;
 import io.braineous.motion.core.model.MotionFrame;
+import io.braineous.motion.core.model.MotionTimeWindow;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,14 +19,12 @@ public class MongoMotionHappeningStoreIT {
     @Inject
     MongoClient mongoClient;
 
-    @Inject
-    MongoMotionHappeningStore store;
-
     @Test
     void test_1_addRecord_and_findByRoutingKey_and_getAll_roundtrip() {
 
         String dbName = "motion_it";
         String collection = "motion_happening_roundtrip";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
         store.clear();
 
@@ -68,6 +68,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_null_noop";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -84,6 +85,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_find_null_routing";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -105,6 +107,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_find_blank_routing";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -126,6 +129,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_find_trimmed_routing";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -158,6 +162,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_find_null_frame";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -179,6 +184,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_find_blank_frame";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -200,6 +206,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_find_trimmed_frame";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -231,6 +238,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_multiple_records";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -276,6 +284,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_mixed_subjects";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -337,6 +346,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_subject_null_blank";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -379,6 +389,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_clear";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -417,6 +428,7 @@ public class MongoMotionHappeningStoreIT {
 
         String dbName = "motion_it";
         String collection = "motion_happening_nested_frame";
+        MongoMotionHappeningStore store = newStore(dbName, collection);
 
 
         store.clear();
@@ -448,11 +460,11 @@ public class MongoMotionHappeningStoreIT {
 
         assertEquals(
                 "2026-05-22T10:00:00Z",
-                out.getMotionFrame().getWindowStart());
+                out.getMotionFrame().getTimeWindow().getWindowStart());
 
         assertEquals(
                 "2026-05-22T10:05:00Z",
-                out.getMotionFrame().getWindowEnd());
+                out.getMotionFrame().getTimeWindow().getWindowEnd());
 
         assertEquals(
                 "1",
@@ -474,6 +486,40 @@ public class MongoMotionHappeningStoreIT {
                 out.toString());
     }
 
+    private MongoMotionHappeningStore newStore(
+            String dbName,
+            String collectionName) {
+
+        MongoMotionHappeningStore store =
+                new MongoMotionHappeningStore();
+
+        store.mongoClient = mongoClient;
+
+        // Direct store ITs own isolated collections that runtime consumers cannot mutate.
+        setField(store, "dbName", dbName);
+        setField(store, "collectionName", collectionName);
+
+        return store;
+    }
+
+    private void setField(
+            MongoMotionHappeningStore store,
+            String fieldName,
+            String value) {
+
+        try {
+            Field field =
+                    MongoMotionHappeningStore.class.getDeclaredField(fieldName);
+
+            field.setAccessible(true);
+            field.set(store, value);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException(
+                    "Unable to configure isolated Mongo store",
+                    exception);
+        }
+    }
+
     private MotionHappeningRecord newRecord(
             String recordId,
             String routingKey,
@@ -484,8 +530,10 @@ public class MongoMotionHappeningStoreIT {
         MotionFrame frame = new MotionFrame();
         frame.setFrameId(frameId);
         frame.setFrameType("ORDER_OPERATION_FRAME");
-        frame.setWindowStart("2026-05-22T10:00:00Z");
-        frame.setWindowEnd("2026-05-22T10:05:00Z");
+        MotionTimeWindow timeWindow = new MotionTimeWindow();
+        timeWindow.setWindowStart("2026-05-22T10:00:00Z");
+        timeWindow.setWindowEnd("2026-05-22T10:05:00Z");
+        frame.setTimeWindow(timeWindow);
         frame.setSequence("1");
         frame.setStatus("OPEN");
         frame.setMetadataJson("{\"runtime\":\"motion\"}");
