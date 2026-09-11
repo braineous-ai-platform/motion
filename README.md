@@ -16,6 +16,27 @@ The goal is not to build another streaming framework.
 
 The goal is to provide a stable operational motion substrate for intelligent systems built on top of evolving operational state.
 
+## Architecture
+
+Runtime continuously processes and materializes Motion's operational truth. Continuous Intelligence sits alongside Runtime inside Motion.
+
+Insights interrogates the operational truth materialized by Motion Runtime through its Operational View and Reasoning View.
+
+```text
+MOTION
+├── Runtime
+│   ├── Event Processor
+│   ├── Time Processor
+│   └── Sink Processor
+│       ├── OperationalSink
+│       └── ECESink
+│
+└── Continuous Intelligence
+    └── Insights
+        ├── Operational View
+        └── Reasoning View
+```
+
 ## Why Operational Motion Matters
 
 Traditional event systems focus on transporting and processing events.
