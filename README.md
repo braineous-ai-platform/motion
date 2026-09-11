@@ -22,20 +22,7 @@ Runtime continuously processes and materializes Motion's operational truth. Cont
 
 Insights interrogates the operational truth materialized by Motion Runtime through its Operational View and Reasoning View.
 
-```text
-MOTION
-├── Runtime
-│   ├── Event Processor
-│   ├── Time Processor
-│   └── Sink Processor
-│       ├── OperationalSink
-│       └── ECESink
-│
-└── Continuous Intelligence
-    └── Insights
-        ├── Operational View
-        └── Reasoning View
-```
+![Motion Architecture](architecture.png)
 
 ## Why Operational Motion Matters
 
