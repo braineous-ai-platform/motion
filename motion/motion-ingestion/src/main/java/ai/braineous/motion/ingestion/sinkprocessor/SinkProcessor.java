@@ -8,6 +8,7 @@ public class SinkProcessor {
 
     private final OperationalViewMaterializer operationalViewMaterializer;
     private final OperationalSink operationalSink;
+    private final CGOECESink cgoECESink;
 
     public SinkProcessor() {
         this.operationalViewMaterializer =
@@ -17,6 +18,9 @@ public class SinkProcessor {
                 CDI.current()
                         .select(MongoOperationalSink.class)
                         .get();
+
+        this.cgoECESink =
+                new CGOECESink();
     }
 
     SinkProcessor(
@@ -28,6 +32,9 @@ public class SinkProcessor {
 
         this.operationalSink =
                 operationalSink;
+
+        this.cgoECESink =
+                new CGOECESink();
     }
 
     public void process(MotionFrame motionFrame) {
@@ -40,11 +47,12 @@ public class SinkProcessor {
                 operationalViewMaterializer.materialize(
                         motionFrame);
 
-        if (operationalView == null) {
-            return;
+        if (operationalView != null) {
+            operationalSink.write(
+                    operationalView);
         }
 
-        operationalSink.write(
-                operationalView);
+        cgoECESink.write(
+                motionFrame);
     }
 }
