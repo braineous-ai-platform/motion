@@ -1,9 +1,15 @@
 package ai.braineous.motion.ingestion.eventprocessor.infra.kafka;
 
+import ai.braineous.motion.ingestion.timeprocessor.model.MotionProcessorResult;
+import ai.braineous.motion.ingestion.timeprocessor.orchestrator.TimeProcessorOrchestrator;
 import ai.braineous.rag.prompt.observe.Console;
 import io.braineous.motion.core.model.MotionEvent;
 import io.braineous.motion.core.model.MotionReplaySignal;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.QuarkusTestProfile;
+import io.quarkus.test.junit.TestProfile;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -15,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
+@TestProfile(MotionEventEmitterIT.Profile.class)
 public class MotionEventEmitterIT {
 
     private static final String BOOTSTRAP_SERVERS = "localhost:9092";
@@ -29,6 +37,14 @@ public class MotionEventEmitterIT {
 
     @Inject
     MotionEventEmitter motionEventEmitter;
+
+    public static class Profile implements QuarkusTestProfile {
+
+        @Override
+        public Set<Class<?>> getEnabledAlternatives() {
+            return Set.<Class<?>>of(NoOpTimeProcessorOrchestrator.class);
+        }
+    }
 
     @Test
     public void test_1() {
@@ -136,5 +152,15 @@ public class MotionEventEmitterIT {
         } finally {
             consumer.close(Duration.ofSeconds(5));
         }
+    }
+}
+
+@Alternative
+@ApplicationScoped
+class NoOpTimeProcessorOrchestrator extends TimeProcessorOrchestrator {
+
+    @Override
+    public MotionProcessorResult process(MotionEvent motionEvent) {
+        return null;
     }
 }

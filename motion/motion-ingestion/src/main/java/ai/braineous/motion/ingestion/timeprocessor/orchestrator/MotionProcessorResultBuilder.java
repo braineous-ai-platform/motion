@@ -54,6 +54,9 @@ public class MotionProcessorResultBuilder {
                 appendResult.toJson());
 
         if (appendResult.getMotionFrame() != null) {
+            result.setMotionFrame(
+                    appendResult.getMotionFrame());
+
             result.setMotionFrameJson(
                     appendResult.getMotionFrame().toJson());
         }

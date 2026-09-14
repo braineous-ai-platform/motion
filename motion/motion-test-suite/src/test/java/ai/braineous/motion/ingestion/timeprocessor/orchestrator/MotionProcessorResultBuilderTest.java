@@ -52,6 +52,10 @@ public class MotionProcessorResultBuilderTest {
         assertNotNull(
                 result.getMotionFrameJson());
 
+        assertSame(
+                appendResult.getMotionFrame(),
+                result.getMotionFrame());
+
         assertEquals(
                 "{\"runtime\":\"motion\"}",
                 result.getMetadataJson());
@@ -102,6 +106,9 @@ public class MotionProcessorResultBuilderTest {
         assertNull(
                 result.getMotionFrameJson());
 
+        assertNull(
+                result.getMotionFrame());
+
         assertEquals(
                 "{\"runtime\":\"motion\"}",
                 result.getMetadataJson());
@@ -138,6 +145,9 @@ public class MotionProcessorResultBuilderTest {
 
         assertNull(
                 result.getMotionFrameJson());
+
+        assertNull(
+                result.getMotionFrame());
 
         assertEquals(
                 "{\"runtime\":\"motion\"}",
@@ -218,6 +228,9 @@ public class MotionProcessorResultBuilderTest {
 
         assertNull(
                 result.getMotionFrameJson());
+
+        assertNull(
+                result.getMotionFrame());
     }
 
     private MotionFrameAppendResult newAppendResult() {

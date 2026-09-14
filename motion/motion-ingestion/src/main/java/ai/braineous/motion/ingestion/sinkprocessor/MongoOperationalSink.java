@@ -10,8 +10,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 import ai.braineous.motion.ingestion.sinkprocessor.model.OperationalView;
+import io.quarkus.arc.Unremovable;
 
 @ApplicationScoped
+@Unremovable
 public class MongoOperationalSink implements OperationalSink {
 
     private static final String DEFAULT_DB_NAME = "motion";

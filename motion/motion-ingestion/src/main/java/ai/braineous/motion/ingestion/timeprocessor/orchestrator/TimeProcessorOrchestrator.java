@@ -60,29 +60,37 @@ public class TimeProcessorOrchestrator {
         MotionFrameRoutingKey routingKey =
                 routingKeyResolver.resolve(event);
 
+        MotionFrameAppendResult appendResult;
+
         if (routingKey == null) {
-            return resultBuilder.build(
+            appendResult =
                     failureAppendResult(
                             "ROUTING_KEY_NOT_FOUND",
-                            "MotionFrameRoutingKey cannot be resolved"));
+                            "MotionFrameRoutingKey cannot be resolved");
+        } else {
+            MotionFrame frame =
+                    frameResolver.resolve(routingKey);
+
+            appendResult =
+                    frameAppender.append(
+                            frame,
+                            event);
         }
-
-        MotionFrame frame =
-                frameResolver.resolve(routingKey);
-
-        MotionFrameAppendResult appendResult =
-                frameAppender.append(
-                        frame,
-                        event);
 
         if ("SUCCESS".equals(appendResult.getStatus())) {
+            MotionFrame completedFrame =
+                    appendResult.getMotionFrame();
+
             persist(
                     routingKey,
-                    appendResult.getMotionFrame());
+                    completedFrame);
         }
 
-        return resultBuilder.build(
-                appendResult);
+        MotionProcessorResult result =
+                resultBuilder.build(
+                        appendResult);
+
+        return result;
     }
 
     private void persist(

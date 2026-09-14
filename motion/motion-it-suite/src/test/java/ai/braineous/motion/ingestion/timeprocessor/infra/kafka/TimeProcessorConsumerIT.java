@@ -1,9 +1,11 @@
 package ai.braineous.motion.ingestion.timeprocessor.infra.kafka;
 
+import ai.braineous.motion.ingestion.sinkprocessor.SinkProcessor;
 import ai.braineous.motion.ingestion.timeprocessor.model.MotionProcessorResult;
 import ai.braineous.motion.ingestion.timeprocessor.orchestrator.TimeProcessorOrchestrator;
 import ai.braineous.rag.prompt.observe.Console;
 import io.braineous.motion.core.model.MotionEvent;
+import io.braineous.motion.core.model.MotionFrame;
 import io.braineous.motion.core.model.MotionReplaySignal;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
@@ -45,6 +47,9 @@ public class TimeProcessorConsumerIT {
     @Inject
     RecordingTimeProcessorOrchestrator orchestrator;
 
+    @Inject
+    RecordingSinkProcessor sinkProcessor;
+
     @ConfigProperty(name = "mp.messaging.incoming.motion-event-in.group.id")
     String consumerGroupId;
 
@@ -55,6 +60,7 @@ public class TimeProcessorConsumerIT {
         String motionEventId = "time-processor-consumer-it-" + UUID.randomUUID();
 
         orchestrator.reset(motionEventId);
+        sinkProcessor.reset();
         awaitConsumerAssignment();
 
         Console.log("Kafka consumer ready", consumerGroupId);
@@ -109,8 +115,10 @@ public class TimeProcessorConsumerIT {
         Console.log("waiting for consumer", motionEventId);
 
         boolean received = orchestrator.awaitReceived(20L, TimeUnit.SECONDS);
+        boolean sinkReceived = sinkProcessor.awaitReceived(20L, TimeUnit.SECONDS);
 
         MotionEvent capturedMotionEvent = orchestrator.getCapturedMotionEvent();
+        MotionFrame capturedMotionFrame = sinkProcessor.getCapturedMotionFrame();
 
         Console.log(
                 "orchestrator invocation observed",
@@ -118,8 +126,14 @@ public class TimeProcessorConsumerIT {
         Console.log("captured event inspected", String.valueOf(capturedMotionEvent));
 
         assertTrue(received);
+        assertTrue(sinkReceived);
         assertEquals(1, orchestrator.getInvocationCount());
+        assertEquals(1, sinkProcessor.getInvocationCount());
         assertNotNull(capturedMotionEvent);
+        assertNotNull(capturedMotionFrame);
+        assertEquals(
+                motionEventId + ":frame",
+                capturedMotionFrame.getFrameId());
         assertEquals(motionEventId, capturedMotionEvent.getEventId());
         assertEquals("ORDER_STATUS_CHANGED", capturedMotionEvent.getEventType());
         assertEquals("2026-09-07T18:00:00Z", capturedMotionEvent.getOriginTime());
@@ -186,7 +200,9 @@ public class TimeProcessorConsumerIT {
 
         @Override
         public Set<Class<?>> getEnabledAlternatives() {
-            return Set.<Class<?>>of(RecordingTimeProcessorOrchestrator.class);
+            return Set.<Class<?>>of(
+                    RecordingTimeProcessorOrchestrator.class,
+                    RecordingSinkProcessor.class);
         }
     }
 }
@@ -217,7 +233,15 @@ class RecordingTimeProcessorOrchestrator extends TimeProcessorOrchestrator {
         capturedMotionEvent = motionEvent;
         invocationCount.incrementAndGet();
         receivedLatch.countDown();
-        return null;
+
+        MotionFrame motionFrame = new MotionFrame();
+        motionFrame.setFrameId(motionEvent.getEventId() + ":frame");
+
+        MotionProcessorResult result = new MotionProcessorResult();
+        result.setStatus("SUCCESS");
+        result.setMotionFrame(motionFrame);
+
+        return result;
     }
 
     public void reset(String expectedMotionEventId) {
@@ -235,6 +259,43 @@ class RecordingTimeProcessorOrchestrator extends TimeProcessorOrchestrator {
 
     public MotionEvent getCapturedMotionEvent() {
         return capturedMotionEvent;
+    }
+
+    public int getInvocationCount() {
+        return invocationCount.get();
+    }
+}
+
+@Alternative
+@ApplicationScoped
+class RecordingSinkProcessor extends SinkProcessor {
+
+    private final AtomicInteger invocationCount = new AtomicInteger();
+    private volatile MotionFrame capturedMotionFrame;
+    private volatile CountDownLatch receivedLatch = new CountDownLatch(1);
+
+    @Override
+    public void process(MotionFrame motionFrame) {
+        capturedMotionFrame = motionFrame;
+        invocationCount.incrementAndGet();
+        receivedLatch.countDown();
+    }
+
+    public void reset() {
+        capturedMotionFrame = null;
+        invocationCount.set(0);
+        receivedLatch = new CountDownLatch(1);
+    }
+
+    public boolean awaitReceived(
+            long timeout,
+            TimeUnit timeUnit) throws InterruptedException {
+
+        return receivedLatch.await(timeout, timeUnit);
+    }
+
+    public MotionFrame getCapturedMotionFrame() {
+        return capturedMotionFrame;
     }
 
     public int getInvocationCount() {

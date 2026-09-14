@@ -1,6 +1,7 @@
 package ai.braineous.motion.ingestion.timeprocessor.model;
 
 import ai.braineous.rag.prompt.observe.Console;
+import io.braineous.motion.core.model.MotionFrame;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +19,11 @@ public class MotionProcessorResultTest {
 
         result.setAppendResultJson(
                 "{\"status\":\"SUCCESS\",\"code\":\"FRAME_APPENDED\"}");
+
+        MotionFrame motionFrame = new MotionFrame();
+        motionFrame.setFrameId("frame-1001");
+        motionFrame.setFrameType("CUSTOMER_ACTIVITY");
+        result.setMotionFrame(motionFrame);
 
         result.setMotionFrameJson(
                 "{\"frameId\":\"frame-1001\",\"frameType\":\"CUSTOMER_ACTIVITY\"}");
@@ -48,6 +54,10 @@ public class MotionProcessorResultTest {
         Assertions.assertEquals(
                 "{\"frameId\":\"frame-1001\",\"frameType\":\"CUSTOMER_ACTIVITY\"}",
                 result.getMotionFrameJson());
+
+        Assertions.assertSame(
+                motionFrame,
+                result.getMotionFrame());
 
         Assertions.assertEquals(
                 "{\"source\":\"MotionProcessorResultTest\"}",

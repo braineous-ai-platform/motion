@@ -1,6 +1,7 @@
 package ai.braineous.motion.ingestion.timeprocessor.model;
 
 import io.braineous.motion.core.model.MotionBaseModel;
+import io.braineous.motion.core.model.MotionFrame;
 
 /**
  * MotionProcessorResult represents the public execution outcome
@@ -30,6 +31,7 @@ public class MotionProcessorResult extends MotionBaseModel {
     private String code;
     private String reason;
     private String appendResultJson;
+    private MotionFrame motionFrame;
     private String motionFrameJson;
     private String metadataJson;
 
@@ -77,6 +79,14 @@ public class MotionProcessorResult extends MotionBaseModel {
         return motionFrameJson;
     }
 
+    public MotionFrame getMotionFrame() {
+        return motionFrame;
+    }
+
+    public void setMotionFrame(MotionFrame motionFrame) {
+        this.motionFrame = motionFrame;
+    }
+
     public void setMotionFrameJson(String motionFrameJson) {
         this.motionFrameJson = motionFrameJson;
     }
@@ -97,6 +107,7 @@ public class MotionProcessorResult extends MotionBaseModel {
                 ", code='" + code + '\'' +
                 ", reason='" + reason + '\'' +
                 ", appendResultJson='" + appendResultJson + '\'' +
+                ", motionFrame=" + motionFrame +
                 ", motionFrameJson='" + motionFrameJson + '\'' +
                 ", metadataJson='" + metadataJson + '\'' +
                 '}';

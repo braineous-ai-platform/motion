@@ -2,8 +2,10 @@ package ai.braineous.motion.ingestion.sinkprocessor;
 
 import ai.braineous.motion.ingestion.sinkprocessor.model.OperationalView;
 import io.braineous.motion.core.model.MotionFrame;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.spi.CDI;
 
+@ApplicationScoped
 public class SinkProcessor {
 
     private final OperationalViewMaterializer operationalViewMaterializer;
