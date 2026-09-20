@@ -17,7 +17,17 @@
   <dependencies>
     <dependency>
       <groupId>io.github.braineous-ai-platform</groupId>
+      <artifactId>cgo-core</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.braineous-ai-platform</groupId>
       <artifactId>motion-core</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.braineous-ai-platform</groupId>
+      <artifactId>motion-ingestion</artifactId>
       <version>1.0.0</version>
     </dependency>
   </dependencies>
