@@ -8,6 +8,7 @@
     <!-- platform -->
     <module>motion-core</module>
     <module>motion-ingestion</module>
+    <module>motion-perception</module>
     <module>motion-test-suite</module>
     <module>motion-it-suite</module>
   </modules>
