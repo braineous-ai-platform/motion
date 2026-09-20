@@ -13,4 +13,12 @@
   <packaging>jar</packaging>
 
   <url>https://github.com/braineous-ai-platform/motion</url>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.github.braineous-ai-platform</groupId>
+      <artifactId>motion-core</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+  </dependencies>
 </project>
