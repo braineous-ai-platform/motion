@@ -1,10 +1,13 @@
 package ai.braineous.motion.perception.model;
 
 import ai.braineous.motion.ingestion.sinkprocessor.model.OperationalView;
+import ai.braineous.rag.prompt.cgo.api.Edge;
 import ai.braineous.rag.prompt.cgo.api.Fact;
-import ai.braineous.rag.prompt.cgo.api.GraphView;
+import ai.braineous.rag.prompt.models.cgo.graph.GraphSnapshot;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
 
 public class ObservationTest {
 
@@ -31,7 +34,7 @@ public class ObservationTest {
     @Test
     public void test_3() {
         Observation observation = new Observation();
-        GraphView reasoningView = newGraphView();
+        GraphSnapshot reasoningView = newGraphSnapshot();
 
         observation.setReasoningView(reasoningView);
 
@@ -44,7 +47,7 @@ public class ObservationTest {
     public void test_4() {
         Observation observation = new Observation();
         OperationalView operationalView = new OperationalView();
-        GraphView reasoningView = newGraphView();
+        GraphSnapshot reasoningView = newGraphSnapshot();
 
         observation.setOperationalView(operationalView);
         observation.setReasoningView(reasoningView);
@@ -62,7 +65,7 @@ public class ObservationTest {
         Observation observation = new Observation();
         OperationalView operationalView = new OperationalView();
         operationalView.setViewId("operational-view-1");
-        GraphView reasoningView = newGraphView();
+        GraphSnapshot reasoningView = newGraphSnapshot();
 
         observation.setOperationalView(operationalView);
         observation.setReasoningView(reasoningView);
@@ -75,17 +78,9 @@ public class ObservationTest {
                         "reasoningView=" + reasoningView));
     }
 
-    private GraphView newGraphView() {
-        return new GraphView() {
-            @Override
-            public Fact getFactById(String id) {
-                return null;
-            }
-
-            @Override
-            public String toString() {
-                return "TestGraphView";
-            }
-        };
+    private GraphSnapshot newGraphSnapshot() {
+        return new GraphSnapshot(
+                new HashMap<String, Fact>(),
+                new HashMap<String, Edge>());
     }
 }

@@ -1,12 +1,12 @@
 package ai.braineous.motion.perception.model;
 
 import ai.braineous.motion.ingestion.sinkprocessor.model.OperationalView;
-import ai.braineous.rag.prompt.cgo.api.GraphView;
+import ai.braineous.rag.prompt.models.cgo.graph.GraphSnapshot;
 import io.braineous.motion.core.model.MotionBaseModel;
 
 public class Observation extends MotionBaseModel {
     private OperationalView operationalView;
-    private GraphView reasoningView;
+    private GraphSnapshot reasoningView;
 
     public OperationalView getOperationalView() {
         return operationalView;
@@ -16,11 +16,11 @@ public class Observation extends MotionBaseModel {
         this.operationalView = operationalView;
     }
 
-    public GraphView getReasoningView() {
+    public GraphSnapshot getReasoningView() {
         return reasoningView;
     }
 
-    public void setReasoningView(GraphView reasoningView) {
+    public void setReasoningView(GraphSnapshot reasoningView) {
         this.reasoningView = reasoningView;
     }
 
