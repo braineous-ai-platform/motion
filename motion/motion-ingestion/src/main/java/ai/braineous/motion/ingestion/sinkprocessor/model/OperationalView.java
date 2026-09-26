@@ -1,5 +1,6 @@
 package ai.braineous.motion.ingestion.sinkprocessor.model;
 
+import ai.braineous.rag.prompt.cgo.api.Fact;
 import io.braineous.motion.core.model.MotionBaseModel;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class OperationalView extends MotionBaseModel {
     private List<String> sourceFrameIds;
     private List<String> sourceEventIds;
     private String materializedAt;
+    private List<Fact> observedView;
 
     public OperationalView() {
     }
@@ -96,6 +98,14 @@ public class OperationalView extends MotionBaseModel {
         this.materializedAt = materializedAt;
     }
 
+    public List<Fact> getObservedView() {
+        return observedView;
+    }
+
+    public void setObservedView(List<Fact> observedView) {
+        this.observedView = observedView;
+    }
+
     @Override
     public String toString() {
         return "OperationalView{" +
@@ -108,6 +118,7 @@ public class OperationalView extends MotionBaseModel {
                 ", sourceFrameIds=" + sourceFrameIds +
                 ", sourceEventIds=" + sourceEventIds +
                 ", materializedAt=" + materializedAt +
+                ", observedView=" + observedView +
                 '}';
     }
 }

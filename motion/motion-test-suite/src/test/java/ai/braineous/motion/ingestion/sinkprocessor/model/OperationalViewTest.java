@@ -1,5 +1,6 @@
 package ai.braineous.motion.ingestion.sinkprocessor.model;
 
+import ai.braineous.rag.prompt.cgo.api.Fact;
 import ai.braineous.rag.prompt.observe.Console;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -55,5 +56,83 @@ public class OperationalViewTest {
         Assertions.assertEquals(materializedAt, operationalView.getMaterializedAt());
 
         Console.log("operationalView", operationalView);
+    }
+
+    @Test
+    public void test_2() {
+        OperationalView operationalView = new OperationalView();
+
+        Assertions.assertNull(operationalView.getObservedView());
+    }
+
+    @Test
+    public void test_3() {
+        OperationalView operationalView = new OperationalView();
+        Fact fact = new Fact("MotionEvent:event-1", "event payload");
+        List<Fact> observedView = new ArrayList<Fact>();
+        observedView.add(fact);
+
+        operationalView.setObservedView(observedView);
+
+        Assertions.assertEquals(1, operationalView.getObservedView().size());
+        Assertions.assertSame(fact, operationalView.getObservedView().get(0));
+    }
+
+    @Test
+    public void test_4() {
+        OperationalView operationalView = new OperationalView();
+        Fact first = new Fact("MotionEvent:event-1", "first payload");
+        Fact second = new Fact("MotionEvent:event-2", "second payload");
+        Fact third = new Fact("MotionEvent:event-3", "third payload");
+        List<Fact> observedView = new ArrayList<Fact>();
+        observedView.add(first);
+        observedView.add(second);
+        observedView.add(third);
+
+        operationalView.setObservedView(observedView);
+
+        Assertions.assertEquals(3, operationalView.getObservedView().size());
+        Assertions.assertSame(first, operationalView.getObservedView().get(0));
+        Assertions.assertSame(second, operationalView.getObservedView().get(1));
+        Assertions.assertSame(third, operationalView.getObservedView().get(2));
+    }
+
+    @Test
+    public void test_5() {
+        OperationalView operationalView = new OperationalView();
+        List<Fact> observedView = new ArrayList<Fact>();
+
+        operationalView.setObservedView(observedView);
+
+        Assertions.assertNotNull(operationalView.getObservedView());
+        Assertions.assertTrue(operationalView.getObservedView().isEmpty());
+    }
+
+    @Test
+    public void test_6() {
+        OperationalView operationalView = new OperationalView();
+        List<Fact> observedView = new ArrayList<Fact>();
+        observedView.add(new Fact("MotionFrame:frame-1", "frame payload"));
+
+        operationalView.setObservedView(observedView);
+
+        Assertions.assertSame(observedView, operationalView.getObservedView());
+    }
+
+    @Test
+    public void test_7() {
+        OperationalView operationalView = new OperationalView();
+        Fact fact = new Fact(
+                "MotionEvent:event-1",
+                "representative event payload");
+        List<Fact> observedView = new ArrayList<Fact>();
+        observedView.add(fact);
+
+        operationalView.setObservedView(observedView);
+
+        String representation = operationalView.toString();
+        Assertions.assertTrue(representation.contains("observedView="));
+        Assertions.assertTrue(representation.contains("MotionEvent:event-1"));
+        Assertions.assertTrue(representation.contains("representative event payload"));
     }
 }
