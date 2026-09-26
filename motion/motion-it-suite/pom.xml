@@ -132,6 +132,11 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <systemPropertyVariables>
+                        <cgo.mongodb.uri>mongodb://localhost:27018</cgo.mongodb.uri>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

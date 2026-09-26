@@ -49,8 +49,6 @@ public class CGOECESinkIT {
 
     @BeforeEach
     public void setup() {
-        System.setProperty("cgo.mongodb.uri", CGO_MONGO_URI);
-
         GraphBuilder.getInstance().clear();
 
         MongoDatabase database =
@@ -70,7 +68,6 @@ public class CGOECESinkIT {
         this.nodeCollection.deleteMany(new Document());
         this.edgeCollection.deleteMany(new Document());
         GraphBuilder.getInstance().clear();
-        System.clearProperty("cgo.mongodb.uri");
     }
 
     @Test

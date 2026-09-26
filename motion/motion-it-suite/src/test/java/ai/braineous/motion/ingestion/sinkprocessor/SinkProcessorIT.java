@@ -32,10 +32,6 @@ public class SinkProcessorIT {
     @Test
     public void test_1() {
 
-        System.setProperty(
-                "cgo.mongodb.uri",
-                "mongodb://localhost:27018");
-
         MongoDatabase operationalDatabase =
                 mongoClient.getDatabase("motion_it");
         MongoCollection<Document> operationalCollection =
@@ -227,7 +223,6 @@ public class SinkProcessorIT {
             nodeCollection.deleteMany(new Document());
             edgeCollection.deleteMany(new Document());
             GraphBuilder.getInstance().clear();
-            System.clearProperty("cgo.mongodb.uri");
         }
     }
 
