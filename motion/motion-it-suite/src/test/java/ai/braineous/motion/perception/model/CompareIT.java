@@ -157,8 +157,17 @@ public class CompareIT {
         assertNotNull(leftReasoningView);
         assertNotNull(leftOperationalView);
         assertNotNull(leftOperationalView.getObservedView());
-        assertTrue(leftReasoningView.edges().isEmpty());
-        assertTrue(rightReasoningView.edges().isEmpty());
+
+        GraphSnapshot persistedGraph =
+                GraphBuilder.getInstance().snapshot();
+        assertTrue(
+                setsEqual(
+                        copyEdgeIds(persistedGraph),
+                        copyEdgeIds(leftReasoningView)));
+        assertTrue(
+                setsEqual(
+                        copyEdgeIds(persistedGraph),
+                        copyEdgeIds(rightReasoningView)));
 
         assertTrue(
                 setsEqual(
@@ -217,7 +226,7 @@ public class CompareIT {
             index = index + 1;
         }
 
-        observable.setFacts(facts);
+        observable.setObservableFacts(facts);
 
         return observationOrchestrator.observe(
                 observable);
@@ -258,6 +267,21 @@ public class CompareIT {
         List<String> keys =
                 new ArrayList<String>();
         keys.addAll(snapshot.nodes().keySet());
+        int index = 0;
+        while (index < keys.size()) {
+            ids.add(keys.get(index));
+            index = index + 1;
+        }
+        return ids;
+    }
+
+    private Set<String> copyEdgeIds(
+            GraphSnapshot snapshot) {
+        Set<String> ids =
+                new HashSet<String>();
+        List<String> keys =
+                new ArrayList<String>();
+        keys.addAll(snapshot.edges().keySet());
         int index = 0;
         while (index < keys.size()) {
             ids.add(keys.get(index));

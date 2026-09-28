@@ -5,21 +5,37 @@ import io.braineous.motion.core.model.MotionBaseModel;
 
 import java.util.List;
 
-public class Observable extends MotionBaseModel {
-    private List<Fact> facts;
+public class Observable extends MotionBaseModel
+{
+    private Fact observableFactAnchor;
+    private List<Fact> observableFacts;
 
-    public List<Fact> getFacts() {
-        return facts;
+    public Fact getObservableFactAnchor()
+    {
+        return observableFactAnchor;
     }
 
-    public void setFacts(List<Fact> facts) {
-        this.facts = facts;
+    public void setObservableFactAnchor(Fact observableFactAnchor)
+    {
+        this.observableFactAnchor = observableFactAnchor;
+    }
+
+    public List<Fact> getObservableFacts()
+    {
+        return observableFacts;
+    }
+
+    public void setObservableFacts(List<Fact> observableFacts)
+    {
+        this.observableFacts = observableFacts;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Observable{" +
-                "facts=" + facts +
+                "observableFactAnchor=" + observableFactAnchor +
+                ", observableFacts=" + observableFacts +
                 '}';
     }
 }

@@ -15,7 +15,8 @@ public class ObservableTest {
     public void test_1() {
         Observable observable = new Observable();
 
-        Assertions.assertNull(observable.getFacts());
+        Assertions.assertNull(observable.getObservableFacts());
+        Assertions.assertNull(observable.getObservableFactAnchor());
     }
 
     @Test
@@ -25,10 +26,10 @@ public class ObservableTest {
         List<Fact> facts = new ArrayList<Fact>();
         facts.add(fact);
 
-        observable.setFacts(facts);
+        observable.setObservableFacts(facts);
 
-        Assertions.assertEquals(1, observable.getFacts().size());
-        Assertions.assertSame(fact, observable.getFacts().get(0));
+        Assertions.assertEquals(1, observable.getObservableFacts().size());
+        Assertions.assertSame(fact, observable.getObservableFacts().get(0));
     }
 
     @Test
@@ -42,12 +43,12 @@ public class ObservableTest {
         facts.add(second);
         facts.add(third);
 
-        observable.setFacts(facts);
+        observable.setObservableFacts(facts);
 
-        Assertions.assertEquals(3, observable.getFacts().size());
-        Assertions.assertSame(first, observable.getFacts().get(0));
-        Assertions.assertSame(second, observable.getFacts().get(1));
-        Assertions.assertSame(third, observable.getFacts().get(2));
+        Assertions.assertEquals(3, observable.getObservableFacts().size());
+        Assertions.assertSame(first, observable.getObservableFacts().get(0));
+        Assertions.assertSame(second, observable.getObservableFacts().get(1));
+        Assertions.assertSame(third, observable.getObservableFacts().get(2));
     }
 
     @Test
@@ -64,9 +65,9 @@ public class ObservableTest {
         List<Fact> facts = new ArrayList<Fact>();
         facts.add(fact);
 
-        observable.setFacts(facts);
+        observable.setObservableFacts(facts);
 
-        Fact carried = observable.getFacts().get(0);
+        Fact carried = observable.getObservableFacts().get(0);
         Assertions.assertEquals("MotionEvent:event-1", carried.getId());
         Assertions.assertEquals(
                 "{\"eventType\":\"ORDER_CREATED\"}",
@@ -83,11 +84,11 @@ public class ObservableTest {
         facts.add(duplicate);
         facts.add(duplicate);
 
-        observable.setFacts(facts);
+        observable.setObservableFacts(facts);
 
-        Assertions.assertEquals(2, observable.getFacts().size());
-        Assertions.assertSame(duplicate, observable.getFacts().get(0));
-        Assertions.assertSame(duplicate, observable.getFacts().get(1));
+        Assertions.assertEquals(2, observable.getObservableFacts().size());
+        Assertions.assertSame(duplicate, observable.getObservableFacts().get(0));
+        Assertions.assertSame(duplicate, observable.getObservableFacts().get(1));
     }
 
     @Test
@@ -95,10 +96,10 @@ public class ObservableTest {
         Observable observable = new Observable();
         List<Fact> facts = new ArrayList<Fact>();
 
-        observable.setFacts(facts);
+        observable.setObservableFacts(facts);
 
-        Assertions.assertNotNull(observable.getFacts());
-        Assertions.assertTrue(observable.getFacts().isEmpty());
+        Assertions.assertNotNull(observable.getObservableFacts());
+        Assertions.assertTrue(observable.getObservableFacts().isEmpty());
     }
 
     @Test
@@ -107,9 +108,9 @@ public class ObservableTest {
         List<Fact> facts = new ArrayList<Fact>();
         facts.add(new Fact("MotionFrame:frame-1", "frame payload"));
 
-        observable.setFacts(facts);
+        observable.setObservableFacts(facts);
 
-        Assertions.assertSame(facts, observable.getFacts());
+        Assertions.assertSame(facts, observable.getObservableFacts());
     }
 
     @Test
@@ -121,11 +122,23 @@ public class ObservableTest {
         List<Fact> facts = new ArrayList<Fact>();
         facts.add(fact);
 
-        observable.setFacts(facts);
+        observable.setObservableFacts(facts);
 
         String representation = observable.toString();
-        Assertions.assertTrue(representation.contains("facts="));
+        Assertions.assertTrue(representation.contains("observableFactAnchor="));
+        Assertions.assertTrue(representation.contains("observableFacts="));
         Assertions.assertTrue(representation.contains("MotionEvent:event-1"));
         Assertions.assertTrue(representation.contains("representative event payload"));
+    }
+
+    @Test
+    public void test_9() {
+        Observable observable = new Observable();
+        Fact anchor = new Fact("MotionEvent:event-1", "anchor payload");
+
+        observable.setObservableFactAnchor(anchor);
+
+        Assertions.assertSame(anchor, observable.getObservableFactAnchor());
+        Assertions.assertNull(observable.getObservableFacts());
     }
 }

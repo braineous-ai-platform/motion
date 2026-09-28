@@ -24,6 +24,7 @@ public class ObservationOrchestrator {
                 assembleOperationalView(reasoningView);
 
         Observation observation = new Observation();
+        observation.setObservable(observable);
         observation.setOperationalView(operationalView);
         observation.setReasoningView(reasoningView);
 
@@ -42,7 +43,7 @@ public class ObservationOrchestrator {
             String[] idTokens = persistedFact.getId().split(":");
             String persistedFactKind = idTokens[0];
 
-            for (Fact observableFact : observable.getFacts()) {
+            for (Fact observableFact : observable.getObservableFacts()) {
                 if (persistedFactKind.equals(observableFact.getId())) {
                     selectedNodes.put(
                             persistedFact.getId(),
@@ -54,6 +55,26 @@ public class ObservationOrchestrator {
 
         Map<String, Edge> selectedEdges =
                 new HashMap<String, Edge>();
+
+        for (Edge persistedEdge : graphSnapshot.edges().values()) {
+            if (persistedEdge == null) {
+                continue;
+            }
+
+            String fromFactId = persistedEdge.getFromFactId();
+            String toFactId = persistedEdge.getToFactId();
+
+            if (fromFactId == null || toFactId == null) {
+                continue;
+            }
+
+            if (selectedNodes.containsKey(fromFactId)
+                    && selectedNodes.containsKey(toFactId)) {
+                selectedEdges.put(
+                        persistedEdge.getId(),
+                        persistedEdge);
+            }
+        }
 
         return new GraphSnapshot(selectedNodes, selectedEdges);
     }

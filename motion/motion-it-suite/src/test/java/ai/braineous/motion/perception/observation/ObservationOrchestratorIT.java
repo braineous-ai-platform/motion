@@ -4,6 +4,7 @@ import ai.braineous.motion.ingestion.sinkprocessor.PerceptionPipelineTestHarness
 import ai.braineous.motion.ingestion.sinkprocessor.model.OperationalView;
 import ai.braineous.motion.perception.model.Observable;
 import ai.braineous.motion.perception.model.Observation;
+import ai.braineous.rag.prompt.cgo.api.Edge;
 import ai.braineous.rag.prompt.cgo.api.Fact;
 import ai.braineous.rag.prompt.models.cgo.graph.GraphBuilder;
 import ai.braineous.rag.prompt.models.cgo.graph.GraphSnapshot;
@@ -290,8 +291,6 @@ public class ObservationOrchestratorIT {
                 operationalView.getObservedView();
 
         assertNotNull(observedView);
-        assertTrue(
-                reasoningView.edges().isEmpty());
 
         Set<String> expectedSet =
                 new HashSet<String>();
@@ -315,7 +314,9 @@ public class ObservationOrchestratorIT {
                             + " rv="
                             + join(rvIds)
                             + " ov="
-                            + join(ovIds));
+                            + join(ovIds)
+                            + " edges="
+                            + join(copyEdgeIds(reasoningView)));
         } else {
             Console.log(
                     "ObservationOrchestratorIT",
@@ -324,7 +325,9 @@ public class ObservationOrchestratorIT {
                             + " RV node ids="
                             + join(rvIds)
                             + " OV Fact ids="
-                            + join(ovIds));
+                            + join(ovIds)
+                            + " RV edge ids="
+                            + join(copyEdgeIds(reasoningView)));
         }
 
         assertEquals(
@@ -375,6 +378,75 @@ public class ObservationOrchestratorIT {
             assertSame(rvFact, ovFact);
             ovIndex = ovIndex + 1;
         }
+
+        GraphSnapshot persistedGraph =
+                GraphBuilder.getInstance().snapshot();
+        Set<String> selectedNodeIds =
+                copyNodeIds(reasoningView);
+        Set<String> expectedEdgeIds =
+                expectedEdgeIds(
+                        persistedGraph,
+                        selectedNodeIds);
+        Set<String> rvEdgeIds =
+                copyEdgeIds(reasoningView);
+
+        assertTrue(
+                setsEqual(expectedEdgeIds, rvEdgeIds));
+        assertEquals(
+                expectedEdgeIds.size(),
+                reasoningView.edges().size());
+
+        List<String> expectedEdgeIdList =
+                new ArrayList<String>();
+        expectedEdgeIdList.addAll(expectedEdgeIds);
+
+        int edgeIndex = 0;
+        while (edgeIndex < expectedEdgeIdList.size()) {
+            String edgeId =
+                    expectedEdgeIdList.get(edgeIndex);
+            Edge persistedEdge =
+                    persistedGraph.edges().get(edgeId);
+            Edge observedEdge =
+                    reasoningView.edges().get(edgeId);
+            assertNotNull(persistedEdge);
+            assertNotNull(observedEdge);
+            assertEquals(
+                    persistedEdge.getId(),
+                    observedEdge.getId());
+            assertEquals(
+                    persistedEdge.getFromFactId(),
+                    observedEdge.getFromFactId());
+            assertEquals(
+                    persistedEdge.getToFactId(),
+                    observedEdge.getToFactId());
+            assertTrue(
+                    selectedNodeIds.contains(
+                            observedEdge.getFromFactId()));
+            assertTrue(
+                    selectedNodeIds.contains(
+                            observedEdge.getToFactId()));
+            edgeIndex = edgeIndex + 1;
+        }
+
+        List<String> observedEdgeIdList =
+                new ArrayList<String>();
+        observedEdgeIdList.addAll(rvEdgeIds);
+
+        int observedEdgeIndex = 0;
+        while (observedEdgeIndex < observedEdgeIdList.size()) {
+            Edge observedEdge =
+                    reasoningView.edges().get(
+                            observedEdgeIdList.get(
+                                    observedEdgeIndex));
+            assertNotNull(observedEdge);
+            assertTrue(
+                    selectedNodeIds.contains(
+                            observedEdge.getFromFactId()));
+            assertTrue(
+                    selectedNodeIds.contains(
+                            observedEdge.getToFactId()));
+            observedEdgeIndex = observedEdgeIndex + 1;
+        }
     }
 
     private Observation observe(
@@ -394,10 +466,27 @@ public class ObservationOrchestratorIT {
             index = index + 1;
         }
 
-        observable.setFacts(facts);
+        observable.setObservableFacts(facts);
 
-        return observationOrchestrator.observe(
-                observable);
+        Fact observableFactAnchor =
+                new Fact(
+                        "ANCHOR",
+                        "developer-declared anchor");
+        observable.setObservableFactAnchor(
+                observableFactAnchor);
+
+        Observation observation =
+                observationOrchestrator.observe(
+                        observable);
+
+        assertSame(
+                observable,
+                observation.getObservable());
+        assertSame(
+                observableFactAnchor,
+                observation.getObservable().getObservableFactAnchor());
+
+        return observation;
     }
 
     private List<String> requested(
@@ -436,6 +525,58 @@ public class ObservationOrchestratorIT {
             ids.add(keys.get(index));
             index = index + 1;
         }
+        return ids;
+    }
+
+    private Set<String> copyEdgeIds(
+            GraphSnapshot snapshot) {
+        Set<String> ids =
+                new HashSet<String>();
+        List<String> keys =
+                new ArrayList<String>();
+        keys.addAll(snapshot.edges().keySet());
+        int index = 0;
+        while (index < keys.size()) {
+            ids.add(keys.get(index));
+            index = index + 1;
+        }
+        return ids;
+    }
+
+    private Set<String> expectedEdgeIds(
+            GraphSnapshot persistedGraph,
+            Set<String> selectedNodeIds) {
+        Set<String> ids =
+                new HashSet<String>();
+        List<Edge> persistedEdges =
+                new ArrayList<Edge>();
+        persistedEdges.addAll(
+                persistedGraph.edges().values());
+
+        int index = 0;
+        while (index < persistedEdges.size()) {
+            Edge persistedEdge =
+                    persistedEdges.get(index);
+            if (persistedEdge == null) {
+                index = index + 1;
+                continue;
+            }
+
+            String fromFactId =
+                    persistedEdge.getFromFactId();
+            String toFactId =
+                    persistedEdge.getToFactId();
+
+            if (fromFactId != null
+                    && toFactId != null
+                    && selectedNodeIds.contains(fromFactId)
+                    && selectedNodeIds.contains(toFactId)) {
+                ids.add(persistedEdge.getId());
+            }
+
+            index = index + 1;
+        }
+
         return ids;
     }
 

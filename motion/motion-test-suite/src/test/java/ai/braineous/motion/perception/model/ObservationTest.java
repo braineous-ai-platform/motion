@@ -15,6 +15,7 @@ public class ObservationTest {
     public void test_1() {
         Observation observation = new Observation();
 
+        Assertions.assertNull(observation.getObservable());
         Assertions.assertNull(observation.getOperationalView());
         Assertions.assertNull(observation.getReasoningView());
     }
@@ -63,19 +64,36 @@ public class ObservationTest {
     @Test
     public void test_5() {
         Observation observation = new Observation();
+        Observable observable = new Observable();
         OperationalView operationalView = new OperationalView();
         operationalView.setViewId("operational-view-1");
         GraphSnapshot reasoningView = newGraphSnapshot();
 
+        observation.setObservable(observable);
         observation.setOperationalView(operationalView);
         observation.setReasoningView(reasoningView);
 
+        Assertions.assertTrue(
+                observation.toString().contains(
+                        "observable=" + observable));
         Assertions.assertTrue(
                 observation.toString().contains(
                         "operationalView=" + operationalView));
         Assertions.assertTrue(
                 observation.toString().contains(
                         "reasoningView=" + reasoningView));
+    }
+
+    @Test
+    public void test_6() {
+        Observation observation = new Observation();
+        Observable observable = new Observable();
+
+        observation.setObservable(observable);
+
+        Assertions.assertSame(
+                observable,
+                observation.getObservable());
     }
 
     private GraphSnapshot newGraphSnapshot() {

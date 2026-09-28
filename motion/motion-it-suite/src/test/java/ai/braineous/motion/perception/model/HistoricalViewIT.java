@@ -130,7 +130,9 @@ public class HistoricalViewIT {
                 6,
                 historicalReasoningView.nodes().size());
         assertTrue(
-                historicalReasoningView.edges().isEmpty());
+                setsEqual(
+                        copyEdgeIds(reasoningView),
+                        copyEdgeIds(historicalReasoningView)));
 
         Set<String> ovIds =
                 copyFactIds(historicalObservedView);
@@ -172,6 +174,21 @@ public class HistoricalViewIT {
         List<String> keys =
                 new ArrayList<String>();
         keys.addAll(snapshot.nodes().keySet());
+        int index = 0;
+        while (index < keys.size()) {
+            ids.add(keys.get(index));
+            index = index + 1;
+        }
+        return ids;
+    }
+
+    private Set<String> copyEdgeIds(
+            GraphSnapshot snapshot) {
+        Set<String> ids =
+                new HashSet<String>();
+        List<String> keys =
+                new ArrayList<String>();
+        keys.addAll(snapshot.edges().keySet());
         int index = 0;
         while (index < keys.size()) {
             ids.add(keys.get(index));
