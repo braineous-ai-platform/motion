@@ -382,3 +382,309 @@ The following are not designed yet. They are deferred on purpose, not omitted by
 - Orchestra integration details
 - Governance implementation
 - System-function invocation mechanics
+---
+
+# Addendum — Cognitive Lifecycle and V1 Scope
+
+**Status:** Architecture clarification  
+**Purpose:** Refine the cognitive lifecycle before implementation of Interpret, Evaluate, and Act.
+
+This addendum does not discard the cognitive operations defined above.
+
+It clarifies their relationship.
+
+---
+
+## 1. Cognition Is Not a Mandatory Linear Pipeline
+
+The original cognitive operations were explored in sequence:
+
+```text
+Compare → Interpret → Evaluate → Act → Learn → Ignore
+```
+
+That sequence was useful for discovering the operations.
+
+It is not the cognitive lifecycle.
+
+Not every cognitive event requires comparison with historical state.
+Not every interpretation requires evaluation.
+Not every cognition necessarily results in action.
+
+Cognitive operations are capabilities that operate on understood reality.
+
+---
+
+## 2. Interpretation Crystallizes Reality
+
+Perception establishes perceived system reality.
+
+Interpret gives that perceived reality meaning.
+
+```text
+Operational Reality
+        ↓
+Observation
+        ↓
+Perception
+        ↓
+Interpret
+        ↓
+Interpretation
+```
+
+**Interpretation is crystallized system reality.**
+
+It is the point from which subsequent cognitive operations can proceed.
+
+---
+
+## 3. Cognitive Operations Branch From Interpretation
+
+The cognitive lifecycle is therefore not one fixed chain.
+
+At a high level:
+
+```text
+                    Interpretation
+                          │
+          ┌───────────────┼────────────────┐
+          ▼               ▼                ▼
+       Compare          Evaluate          Act
+          │               │
+          ▼               ▼
+      Interpret           Act
+          │
+          ▼
+      Comparison
+```
+
+The path taken depends on the cognitive task.
+
+### Analytical cognition
+
+```text
+Interpretation
+      ↓
+   Compare
+      ↓
+  Interpret
+      ↓
+ Comparison
+```
+
+### Evaluative cognition
+
+```text
+Interpretation
+      ↓
+   Evaluate
+      ↓
+     Act
+```
+
+### Direct action
+
+At the cognitive-model level, an interpreted reality may be sufficient to
+produce an action without an explicit Compare operation.
+
+Whether BraineousAI permits such a path to mutate an enterprise system is a
+separate runtime and governance decision.
+
+---
+
+## 4. Compare Operates on Meaning, Not Raw Reality
+
+Compare is not required to establish the meaning of a reality.
+
+Each reality must first be interpreted.
+
+Conceptually:
+
+```text
+Current Reality
+      ↓
+   Interpret
+      ↓
+Interpretation A ──────┐
+                       │
+                       ├── Compare
+                       │
+Historical Reality     │
+      ↓                │
+   Interpret           │
+      ↓                │
+Interpretation B ──────┘
+                       ↓
+              Comparative State
+                       ↓
+                   Interpret
+                       ↓
+                  Comparison
+```
+
+This produces three distinct acts of interpretation:
+
+1. interpret the current reality;
+2. interpret the historical reality;
+3. interpret the relationship between those interpreted realities.
+
+The resulting `Comparison` remains the analytical artifact of comparative
+cognition.
+
+---
+
+## 5. Compare and Learn Are Naturally Related
+
+Compare and Learn belong to the longitudinal dimension of cognition.
+
+Compare establishes relationships between interpreted realities across state,
+time, or experience.
+
+Learn operates over accumulated cognitive experience.
+
+Conceptually:
+
+```text
+Interpretations over time
+          ↓
+       Compare
+          ↓
+     Comparisons
+          ↓
+     Evaluations
+          ↓
+        Learn
+          ↓
+ Learned Knowledge
+          ↓
+ future cognition
+```
+
+Learning without some notion of difference, recurrence, relationship, or
+change is incomplete.
+
+The exact mechanics of this relationship remain deferred.
+
+---
+
+## 6. V1 Perceptive Intelligence
+
+A complete operational cognitive loop does not require every cognitive
+operation.
+
+For V1, the core vertical is:
+
+```text
+Operational Reality
+        ↓
+Observation
+        ↓
+Perception
+        ↓
+Interpret
+        ↓
+Interpretation
+        ↓
+Evaluate
+        ↓
+Act
+        ↓
+Governance
+        ↓
+System Mutation
+```
+
+This loop is sufficient for an operational system to:
+
+- observe evolving reality;
+- perceive relevant system state;
+- interpret what that state means;
+- evaluate that interpretation against developer-declared controls;
+- invoke developer-declared system capabilities;
+- govern the resulting mutation.
+
+That constitutes a complete operational Perceptive Intelligence loop.
+
+---
+
+## 7. Compare Is Not a V1 Release Dependency
+
+Compare remains a first-class cognitive operation.
+
+Compare and Learn together form the longitudinal foundation of Cognitive Intelligence and remain post-V1.
+
+It is not currently a prerequisite for V1.
+
+Its inclusion in the V1 release must be earned by a concrete use case that
+requires comparative or longitudinal cognition.
+
+The existence of Compare primitives does not make Compare a release
+dependency.
+
+The currently implemented Compare substrate remains valid research and
+architecture:
+
+- `HistoricalViewWindow`
+- `HistoricalView`
+- `Compare`
+
+These components are retained.
+
+Their existence does not dictate product sequencing.
+
+---
+
+## 8. Learn Remains Deferred
+
+Learn remains outside the V1 core.
+
+Its natural relationship with Compare is now clearer, but its mechanics remain
+intentionally unspecified.
+
+No learning mechanism should be selected merely to complete a conceptual
+pipeline.
+
+Learn will be designed from concrete longitudinal cognition requirements.
+
+---
+
+## 9. V1 Build Sequence
+
+The immediate V1 Perceptive Intelligence build sequence is therefore:
+
+```text
+Interpret
+    ↓
+Interpretation
+    ↓
+Evaluate
+    ↓
+Act
+    ↓
+Governance
+```
+
+Observation and Perception already provide the upstream operational reality.
+
+Compare and Learn remain available cognitive branches but are not on the V1
+critical path.
+
+---
+
+## 10. Design Discipline
+
+The cognitive model must not be forced into a linear software pipeline simply
+because the operations were discovered sequentially.
+
+The governing principle is:
+
+> **Reality is perceived. Perceived reality is interpreted into meaning.
+> Cognition operates on that meaning according to the task at hand.**
+
+Product scope follows concrete operational use cases.
+
+Architecture does not earn release scope merely because it is intellectually
+complete.
+
+END OF ADDENDUM
