@@ -6,6 +6,8 @@ import ai.braineous.rag.prompt.models.cgo.graph.BindResult;
 import ai.braineous.rag.prompt.models.cgo.graph.GraphBuilder;
 import ai.braineous.rag.prompt.models.cgo.graph.Input;
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 
 public class PerceptionPipelineTestHarness {
 
@@ -16,7 +18,19 @@ public class PerceptionPipelineTestHarness {
         this.mongoClient = mongoClient;
     }
 
+    public void resetGraphState() {
+        GraphBuilder.getInstance().clear();
+
+        MongoDatabase cgoDatabase =
+                this.mongoClient.getDatabase("cgo");
+        cgoDatabase.getCollection("cgo_nodes").deleteMany(new Document());
+        cgoDatabase.getCollection("cgo_edges").deleteMany(new Document());
+
+        GraphBuilder.getInstance().clear();
+    }
+
     public void seed() {
+        resetGraphState();
 
         GraphBuilder graphBuilder =
                 GraphBuilder.getInstance();

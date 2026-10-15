@@ -53,6 +53,16 @@
         </dependency>
         <dependency>
             <groupId>io.github.braineous-ai-platform</groupId>
+            <artifactId>cgo-llm</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.braineous-ai-platform</groupId>
+            <artifactId>llmdd-query-client</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.braineous-ai-platform</groupId>
             <artifactId>motion-core</artifactId>
             <version>1.0.0</version>
         </dependency>

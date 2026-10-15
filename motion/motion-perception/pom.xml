@@ -30,5 +30,10 @@
       <artifactId>motion-ingestion</artifactId>
       <version>1.0.0</version>
     </dependency>
+    <dependency>
+      <groupId>io.github.braineous-ai-platform</groupId>
+      <artifactId>module-orchestra-definition</artifactId>
+      <version>1.0.0</version>
+    </dependency>
   </dependencies>
 </project>

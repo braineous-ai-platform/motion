@@ -8,6 +8,7 @@ public class SystemAnalysis extends MotionBaseModel {
     private String analysisId;
     private String createdAt;
     private String cognitiveQuery;
+    private String cognitiveResultJson;
 
     public SystemAnalysis() {
     }
@@ -44,6 +45,14 @@ public class SystemAnalysis extends MotionBaseModel {
         this.cognitiveQuery = cognitiveQuery;
     }
 
+    public String getCognitiveResultJson() {
+        return this.cognitiveResultJson;
+    }
+
+    public void setCognitiveResultJson(String cognitiveResultJson) {
+        this.cognitiveResultJson = cognitiveResultJson;
+    }
+
     @Override
     public String toString() {
         return "SystemAnalysis{" +
@@ -51,6 +60,7 @@ public class SystemAnalysis extends MotionBaseModel {
                 ", analysisId='" + analysisId + '\'' +
                 ", createdAt='" + createdAt + '\'' +
                 ", cognitiveQuery='" + cognitiveQuery + '\'' +
+                ", cognitiveResultJson='" + cognitiveResultJson + '\'' +
                 '}';
     }
 }
