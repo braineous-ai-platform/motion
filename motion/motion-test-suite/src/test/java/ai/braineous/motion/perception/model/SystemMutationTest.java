@@ -1,5 +1,7 @@
 package ai.braineous.motion.perception.model;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.braineous.motion.core.model.MotionBaseModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -153,5 +155,64 @@ public class SystemMutationTest {
         Assertions.assertTrue(json.contains("mutationId"));
         Assertions.assertTrue(json.contains("cognitiveResultJson"));
         Assertions.assertTrue(json.contains("queryExecutionJson"));
+    }
+
+    @Test
+    public void test_9() {
+        Observation observation = new Observation();
+        Perception perception = new Perception();
+        perception.setObservation(observation);
+
+        String mutationId = "mutation-event-1";
+        String cognitiveResultJson =
+                "{\"description\":null,"
+                        + "\"commitOrder\":[\"mo_it_q1_fetch_options\"],"
+                        + "\"gateResult\":{\"ok\":true,\"why\":\"approved\",\"commitId\":null},"
+                        + "\"stepResults\":[{\"id\":\"mo_it_q1_fetch_options\","
+                        + "\"queryResult\":{\"ok\":true,"
+                        + "\"requestJson\":{},"
+                        + "\"queryExecutionJson\":{}}}]}";
+
+        SystemMutation original = new SystemMutation();
+        original.setPerception(perception);
+        original.setMutationId(mutationId);
+        original.setCognitiveResultJson(cognitiveResultJson);
+
+        String mutationEvent = original.toJson();
+        JsonObject root = JsonParser.parseString(mutationEvent).getAsJsonObject();
+
+        Assertions.assertEquals(5, root.size());
+        Assertions.assertTrue(root.has("perception"));
+        Assertions.assertTrue(root.has("mutationId"));
+        Assertions.assertTrue(root.has("createdAt"));
+        Assertions.assertTrue(root.has("cognitiveQuery"));
+        Assertions.assertTrue(root.has("cognitiveResultJson"));
+        Assertions.assertFalse(root.has("eventId"));
+        Assertions.assertFalse(root.has("eventType"));
+        Assertions.assertFalse(root.has("payloadJson"));
+        Assertions.assertFalse(root.has("originTime"));
+        Assertions.assertFalse(root.has("receivedAt"));
+        Assertions.assertFalse(root.has("replaySignal"));
+
+        Assertions.assertEquals(mutationId, root.get("mutationId").getAsString());
+        Assertions.assertTrue(root.get("perception").isJsonObject());
+        Assertions.assertTrue(
+                root.get("perception").getAsJsonObject().has("observation"));
+        Assertions.assertTrue(root.get("cognitiveResultJson").isJsonPrimitive());
+        Assertions.assertEquals(
+                cognitiveResultJson,
+                root.get("cognitiveResultJson").getAsString());
+
+        SystemMutation restored =
+                MotionBaseModel.fromJson(mutationEvent, SystemMutation.class);
+
+        Assertions.assertEquals(mutationId, restored.getMutationId());
+        Assertions.assertEquals(
+                cognitiveResultJson,
+                restored.getCognitiveResultJson());
+        Assertions.assertNotNull(restored.getPerception());
+        Assertions.assertNotNull(restored.getPerception().getObservation());
+        Assertions.assertNull(restored.getCreatedAt());
+        Assertions.assertNull(restored.getCognitiveQuery());
     }
 }

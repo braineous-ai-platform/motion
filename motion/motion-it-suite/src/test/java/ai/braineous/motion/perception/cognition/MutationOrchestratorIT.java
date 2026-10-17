@@ -7,6 +7,8 @@ import ai.braineous.motion.perception.model.Observation;
 import ai.braineous.motion.perception.model.Perception;
 import ai.braineous.motion.perception.model.SystemMutation;
 import ai.braineous.rag.prompt.cgo.api.Edge;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import ai.braineous.rag.prompt.cgo.api.Fact;
 import ai.braineous.rag.prompt.models.cgo.graph.GraphBuilder;
 import ai.braineous.rag.prompt.models.cgo.graph.GraphSnapshot;
@@ -14,6 +16,7 @@ import ai.braineous.rag.prompt.observe.Console;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import io.braineous.motion.core.model.MotionBaseModel;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.bson.Document;
@@ -153,6 +156,53 @@ public class MutationOrchestratorIT {
 
             Console.log("it.cognitiveResultJson", cognitiveResultJson);
             Console.log("it.mutationId", mutation.getMutationId());
+
+            String mutationEvent = mutation.toJson();
+            Console.log("it.mutationEvent", mutationEvent);
+
+            JsonObject root = JsonParser.parseString(mutationEvent).getAsJsonObject();
+            Assertions.assertEquals(5, root.size());
+            Assertions.assertTrue(root.has("perception"));
+            Assertions.assertTrue(root.has("mutationId"));
+            Assertions.assertTrue(root.has("createdAt"));
+            Assertions.assertTrue(root.has("cognitiveQuery"));
+            Assertions.assertTrue(root.has("cognitiveResultJson"));
+            Assertions.assertFalse(root.has("eventId"));
+            Assertions.assertFalse(root.has("eventType"));
+            Assertions.assertFalse(root.has("payloadJson"));
+            Assertions.assertFalse(root.has("originTime"));
+            Assertions.assertFalse(root.has("receivedAt"));
+            Assertions.assertFalse(root.has("replaySignal"));
+
+            Assertions.assertEquals(
+                    mutation.getMutationId(),
+                    root.get("mutationId").getAsString());
+            Assertions.assertTrue(root.get("perception").isJsonObject());
+            Assertions.assertTrue(
+                    root.get("perception").getAsJsonObject().has("observation"));
+            Assertions.assertTrue(mutationEvent.contains(PAY_1001));
+            Assertions.assertTrue(root.get("cognitiveResultJson").isJsonPrimitive());
+            Assertions.assertEquals(
+                    cognitiveResultJson,
+                    root.get("cognitiveResultJson").getAsString());
+
+            SystemMutation restored =
+                    MotionBaseModel.fromJson(mutationEvent, SystemMutation.class);
+            Assertions.assertEquals(
+                    mutation.getMutationId(),
+                    restored.getMutationId());
+            Assertions.assertEquals(
+                    cognitiveResultJson,
+                    restored.getCognitiveResultJson());
+            Assertions.assertNotNull(restored.getPerception());
+            Assertions.assertNotNull(restored.getPerception().getObservation());
+            Assertions.assertEquals(
+                    PAY_1001,
+                    restored.getPerception()
+                            .getObservation()
+                            .getObservable()
+                            .getObservableFactAnchor()
+                            .getId());
 
             long analysisCountAfter = analysisCollection.countDocuments();
             long mutationCountAfter = mutationCollection.countDocuments();
