@@ -1,0 +1,9 @@
+select from llm
+where factId = 'Inventory:INV-001'
+and relatedFactIds = 'Sales:SALE-001,Vendor:VENDOR-001,Product:PROD-SHAMPOO-250,Location:LOC-001'
+control
+method = 'assess_inventory_operational_readiness'
+parameters = 'Inventory.quantityOnHand, Inventory.quantityReserved, Sales.quantitySold, Vendor.leadTimeDays, Product.productId, Location.locationType'
+expression = 'calculate Inventory.quantityOnHand minus Inventory.quantityReserved divided by Sales.quantitySold'
+spec = 'if expression is greater than 1 result is READY, else REVIEW'
+result=""
