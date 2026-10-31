@@ -1,4 +1,4 @@
-package ai.braineous.motion.it.jit;
+package ai.braineous.motion.prototype;
 
 import ai.braineous.rag.prompt.cgo.api.Fact;
 import ai.braineous.rag.prompt.cgo.api.QueryExecution;
@@ -12,12 +12,14 @@ import io.braineous.dd.llm.query.client.QueryClient;
 import io.braineous.dd.llm.query.client.QueryResult;
 import io.braineous.dd.llm.query.client.RESTClient;
 import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+@Disabled("Legacy arithmetic CPL prototype; superseded by the Phase 2 decision-oriented contract.")
 @QuarkusTest
 public class JitCognitiveQueryDriftIT {
 

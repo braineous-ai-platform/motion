@@ -1,14 +1,16 @@
-package ai.braineous.motion.it.jit;
+package ai.braineous.motion.prototype;
 
 import ai.braineous.rag.prompt.cgo.api.Fact;
 import ai.braineous.rag.prompt.models.cgo.graph.GraphBuilder;
 import ai.braineous.rag.prompt.models.cgo.graph.GraphSnapshot;
 import ai.braineous.rag.prompt.observe.Console;
 import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+@Disabled("Legacy arithmetic CPL prototype; superseded by the Phase 2 decision-oriented contract.")
 @QuarkusTest
 public class JitCognitiveControlIT {
 
