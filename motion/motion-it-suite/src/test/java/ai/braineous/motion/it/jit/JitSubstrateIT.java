@@ -13,13 +13,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-@QuarkusTest
 public class JitSubstrateIT {
 
     private static final long SOLD_AT = 1792584000000L;

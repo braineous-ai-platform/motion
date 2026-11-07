@@ -44,22 +44,7 @@ public class JitDecisionIT extends JitSubstrateIT {
         try {
             super.test_1();
 
-            InputStream stream =
-                    JitDecisionIT.class.getResourceAsStream(
-                            "/jit/v14-jit-decision-query.json");
-            if (stream == null) {
-                throw new RuntimeException(
-                        "missing resource /jit/v14-jit-decision-query.json");
-            }
-
-            byte[] bytes;
-            try {
-                bytes = stream.readAllBytes();
-            } finally {
-                stream.close();
-            }
-
-            String sql = new String(bytes, StandardCharsets.UTF_8);
+            String sql = this.loadJitSql();
             printBlock("LOADED CPL SQL", sql);
 
             GraphBuilder graphBuilder = GraphBuilder.getInstance();
@@ -70,76 +55,7 @@ public class JitDecisionIT extends JitSubstrateIT {
             printPublishedPhase0(snapshot);
             printRelevantSnapshot(snapshot);
 
-            QueryClient client = new RESTClient();
-            QueryResult result = client.query(sql);
-
-            printBlock("QUERY RESULT", String.valueOf(result));
-            if (result == null) {
-                printBlock("QUERY RESULT STATUS", "null");
-                printBlock("QUERY RESULT WHY", "null");
-                printBlock("QUERY RESULT REQUEST JSON", "null");
-                printBlock("QUERY RESULT EXECUTION JSON", "null");
-                printBlock("QUERY EXECUTION STATUS", "null");
-                printBlock("QUERY EXECUTION STAGE", "null");
-                printBlock("PROMPT VALIDATION", "null");
-                printBlock("LLM RESPONSE VALIDATION", "null");
-                printBlock("DOMAIN VALIDATION", "null");
-                printBlock("RAW LLM RESPONSE", "null");
-                printBlock("EXTRACTED RESULT", "null");
-            } else {
-                printBlock("QUERY RESULT STATUS", String.valueOf(result.isOk()));
-                if (result.getWhy() == null) {
-                    printBlock("QUERY RESULT WHY", "null");
-                } else {
-                    printBlock("QUERY RESULT WHY", result.getWhy().toString());
-                }
-                if (result.getRequestJson() == null) {
-                    printBlock("QUERY RESULT REQUEST JSON", "null");
-                } else {
-                    printBlock("QUERY RESULT REQUEST JSON", result.getRequestJson().toString());
-                }
-                if (result.getQueryExecutionJson() == null) {
-                    printBlock("QUERY RESULT EXECUTION JSON", "null");
-                    printBlock("QUERY EXECUTION STATUS", "null");
-                    printBlock("QUERY EXECUTION STAGE", "null");
-                    printBlock("PROMPT VALIDATION", "null");
-                    printBlock("LLM RESPONSE VALIDATION", "null");
-                    printBlock("DOMAIN VALIDATION", "null");
-                    printBlock("RAW LLM RESPONSE", "null");
-                    printBlock("EXTRACTED RESULT", "null");
-                } else {
-                    printBlock(
-                            "QUERY RESULT EXECUTION JSON",
-                            result.getQueryExecutionJson().toString());
-                    QueryExecution<?> execution =
-                            QueryExecution.fromJson(result.getQueryExecutionJson());
-                    if (execution == null) {
-                        printBlock("QUERY EXECUTION STATUS", "null");
-                        printBlock("QUERY EXECUTION STAGE", "null");
-                        printBlock("PROMPT VALIDATION", "null");
-                        printBlock("LLM RESPONSE VALIDATION", "null");
-                        printBlock("DOMAIN VALIDATION", "null");
-                        printBlock("RAW LLM RESPONSE", "null");
-                        printBlock("EXTRACTED RESULT", "null");
-                    } else {
-                        printBlock("QUERY EXECUTION STATUS", String.valueOf(execution.getStatus()));
-                        printBlock("QUERY EXECUTION STAGE", String.valueOf(execution.getStage()));
-                        printBlock("PROMPT VALIDATION", String.valueOf(execution.getPromptValidation()));
-                        printBlock(
-                                "LLM RESPONSE VALIDATION",
-                                String.valueOf(execution.getLlmResponseValidation()));
-                        printBlock(
-                                "DOMAIN VALIDATION",
-                                String.valueOf(execution.getDomainValidation()));
-                        printBlock("RAW LLM RESPONSE", String.valueOf(execution.getRawResponse()));
-                        printBlock(
-                                "EXTRACTED RESULT",
-                                String.valueOf(extractResultValue(execution.getRawResponse())));
-                    }
-                }
-            }
-
-            printBlock("EXCEPTIONS", "none");
+            this.observeOnce(sql);
         } catch (RuntimeException exception) {
             printBlock("EXCEPTIONS", String.valueOf(exception));
             exception.printStackTrace(System.out);
@@ -158,174 +74,18 @@ public class JitDecisionIT extends JitSubstrateIT {
         try {
             super.test_1();
 
-            Product product = new Product();
-            product.setProductId("PROD-SHAMPOO-250");
-            product.setSku("SHAMPOO-250");
-            product.setName("Shampoo 250 mL");
-            product.setUnitOfMeasure("bottle");
-
-            Location location = new Location();
-            location.setLocationId("LOC-001");
-            location.setName("Primary Inventory Location");
-            location.setLocationType("storage");
-
-            Inventory inventory = new Inventory();
-            inventory.setInventoryId("INV-001");
-            inventory.setQuantityOnHand(5);
-            inventory.setQuantityReserved(4);
-            inventory.setProduct(product);
-            inventory.setLocation(location);
-
-            StringBuilder scenario = new StringBuilder();
-            scenario.append("Inventory:INV-001\n");
-            scenario.append("quantityOnHand=5\n");
-            scenario.append("quantityReserved=4\n");
-            scenario.append("Sales:SALE-001\n");
-            scenario.append("quantitySold=25\n");
-            scenario.append("Vendor:VENDOR-001\n");
-            scenario.append("leadTimeDays=7\n");
-            scenario.append("Product:PROD-SHAMPOO-250 unchanged\n");
-            scenario.append("Location:LOC-001 unchanged");
-            printBlock("SCENARIO FACT VALUES", scenario.toString());
-
-            Gson gson = new Gson();
-            JsonObject root = new JsonObject();
-            root.add("inventory", gson.toJsonTree(inventory));
-            String arrayPayload = "[" + root.toString() + "]";
-
-            final JitFactExtractor domainExtractor = new JitFactExtractor();
-            FactExtractor publicationExtractor = new FactExtractor() {
-                @Override
-                public List<Fact> extract(String jsonArray) {
-                    JsonArray elements =
-                            JsonParser.parseString(jsonArray).getAsJsonArray();
-                    String elementJson = elements.get(0).toString();
-                    return domainExtractor.extract(elementJson);
-                }
-            };
-
-            LLMContext context = new LLMContext();
-            context.build(
-                    "jit_substrate",
-                    arrayPayload,
-                    publicationExtractor,
-                    new JitRelationshipProvider(),
-                    null);
-
-            CausalLLMBridge bridge = new CausalLLMBridge();
-            bridge.submit(context);
+            String sql = this.loadJitSql();
+            printBlock("LOADED CPL SQL", sql);
 
             GraphBuilder graphBuilder = GraphBuilder.getInstance();
             GraphSnapshot snapshot = null;
             if (graphBuilder != null) {
                 snapshot = graphBuilder.snapshot();
             }
+            printPublishedPhase0(snapshot);
             printRelevantSnapshot(snapshot);
 
-            Fact publishedInventory = null;
-            if (snapshot != null && snapshot.nodes() != null) {
-                publishedInventory = snapshot.nodes().get("Inventory:INV-001");
-            }
-            String publishedText = null;
-            if (publishedInventory != null) {
-                publishedText = publishedInventory.getText();
-            }
-            if (publishedText == null
-                    || publishedText.indexOf("\"quantityOnHand\":5") < 0
-                    || publishedText.indexOf("\"quantityReserved\":4") < 0) {
-                throw new RuntimeException(
-                        "changed Inventory fact was not visible in the CGO snapshot: "
-                                + String.valueOf(publishedText));
-            }
-
-            InputStream stream =
-                    JitDecisionIT.class.getResourceAsStream(
-                            "/jit/v14-jit-decision-query.json");
-            if (stream == null) {
-                throw new RuntimeException(
-                        "missing resource /jit/v14-jit-decision-query.json");
-            }
-
-            byte[] bytes;
-            try {
-                bytes = stream.readAllBytes();
-            } finally {
-                stream.close();
-            }
-
-            String sql = new String(bytes, StandardCharsets.UTF_8);
-            printBlock("LOADED CPL SQL", sql);
-
-            QueryClient client = new RESTClient();
-            QueryResult result = client.query(sql);
-
-            printBlock("QUERY RESULT", String.valueOf(result));
-            if (result == null) {
-                printBlock("QUERY RESULT STATUS", "null");
-                printBlock("QUERY RESULT WHY", "null");
-                printBlock("QUERY RESULT REQUEST JSON", "null");
-                printBlock("QUERY RESULT EXECUTION JSON", "null");
-                printBlock("QUERY EXECUTION STATUS", "null");
-                printBlock("QUERY EXECUTION STAGE", "null");
-                printBlock("PROMPT VALIDATION", "null");
-                printBlock("LLM RESPONSE VALIDATION", "null");
-                printBlock("DOMAIN VALIDATION", "null");
-                printBlock("RAW LLM RESPONSE", "null");
-                printBlock("EXTRACTED RESULT", "null");
-            } else {
-                printBlock("QUERY RESULT STATUS", String.valueOf(result.isOk()));
-                if (result.getWhy() == null) {
-                    printBlock("QUERY RESULT WHY", "null");
-                } else {
-                    printBlock("QUERY RESULT WHY", result.getWhy().toString());
-                }
-                if (result.getRequestJson() == null) {
-                    printBlock("QUERY RESULT REQUEST JSON", "null");
-                } else {
-                    printBlock("QUERY RESULT REQUEST JSON", result.getRequestJson().toString());
-                }
-                if (result.getQueryExecutionJson() == null) {
-                    printBlock("QUERY RESULT EXECUTION JSON", "null");
-                    printBlock("QUERY EXECUTION STATUS", "null");
-                    printBlock("QUERY EXECUTION STAGE", "null");
-                    printBlock("PROMPT VALIDATION", "null");
-                    printBlock("LLM RESPONSE VALIDATION", "null");
-                    printBlock("DOMAIN VALIDATION", "null");
-                    printBlock("RAW LLM RESPONSE", "null");
-                    printBlock("EXTRACTED RESULT", "null");
-                } else {
-                    printBlock(
-                            "QUERY RESULT EXECUTION JSON",
-                            result.getQueryExecutionJson().toString());
-                    QueryExecution<?> execution =
-                            QueryExecution.fromJson(result.getQueryExecutionJson());
-                    if (execution == null) {
-                        printBlock("QUERY EXECUTION STATUS", "null");
-                        printBlock("QUERY EXECUTION STAGE", "null");
-                        printBlock("PROMPT VALIDATION", "null");
-                        printBlock("LLM RESPONSE VALIDATION", "null");
-                        printBlock("DOMAIN VALIDATION", "null");
-                        printBlock("RAW LLM RESPONSE", "null");
-                        printBlock("EXTRACTED RESULT", "null");
-                    } else {
-                        printBlock("QUERY EXECUTION STATUS", String.valueOf(execution.getStatus()));
-                        printBlock("QUERY EXECUTION STAGE", String.valueOf(execution.getStage()));
-                        printBlock("PROMPT VALIDATION", String.valueOf(execution.getPromptValidation()));
-                        printBlock(
-                                "LLM RESPONSE VALIDATION",
-                                String.valueOf(execution.getLlmResponseValidation()));
-                        printBlock(
-                                "DOMAIN VALIDATION",
-                                String.valueOf(execution.getDomainValidation()));
-                        printBlock("RAW LLM RESPONSE", String.valueOf(execution.getRawResponse()));
-                        printBlock(
-                                "EXTRACTED RESULT",
-                                String.valueOf(extractResultValue(execution.getRawResponse())));
-                    }
-                }
-            }
-
-            printBlock("EXCEPTIONS", "none");
+            this.observeLoop(sql, true);
         } catch (RuntimeException exception) {
             printBlock("EXCEPTIONS", String.valueOf(exception));
             exception.printStackTrace(System.out);
@@ -337,6 +97,267 @@ public class JitDecisionIT extends JitSubstrateIT {
             exception.printStackTrace();
             throw new RuntimeException(exception);
         }
+    }
+
+    @Test
+    public void test_3() {
+        try {
+            this.publishReviewInventory();
+
+            String sql = this.loadJitSql();
+            printBlock("LOADED CPL SQL", sql);
+
+            this.observeOnce(sql);
+        } catch (RuntimeException exception) {
+            printBlock("EXCEPTIONS", String.valueOf(exception));
+            exception.printStackTrace(System.out);
+            exception.printStackTrace();
+            throw exception;
+        } catch (Exception exception) {
+            printBlock("EXCEPTIONS", String.valueOf(exception));
+            exception.printStackTrace(System.out);
+            exception.printStackTrace();
+            throw new RuntimeException(exception);
+        }
+    }
+
+    @Test
+    public void test_4() {
+        try {
+            this.publishReviewInventory();
+
+            String sql = this.loadJitSql();
+            printBlock("LOADED CPL SQL", sql);
+
+            this.observeLoop(sql, false);
+        } catch (RuntimeException exception) {
+            printBlock("EXCEPTIONS", String.valueOf(exception));
+            exception.printStackTrace(System.out);
+            exception.printStackTrace();
+            throw exception;
+        } catch (Exception exception) {
+            printBlock("EXCEPTIONS", String.valueOf(exception));
+            exception.printStackTrace(System.out);
+            exception.printStackTrace();
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private void publishReviewInventory() {
+        super.test_1();
+
+        Product product = new Product();
+        product.setProductId("PROD-SHAMPOO-250");
+        product.setSku("SHAMPOO-250");
+        product.setName("Shampoo 250 mL");
+        product.setUnitOfMeasure("bottle");
+
+        Location location = new Location();
+        location.setLocationId("LOC-001");
+        location.setName("Primary Inventory Location");
+        location.setLocationType("storage");
+
+        Inventory inventory = new Inventory();
+        inventory.setInventoryId("INV-001");
+        inventory.setQuantityOnHand(5);
+        inventory.setQuantityReserved(4);
+        inventory.setProduct(product);
+        inventory.setLocation(location);
+
+        StringBuilder scenario = new StringBuilder();
+        scenario.append("Inventory:INV-001\n");
+        scenario.append("quantityOnHand=5\n");
+        scenario.append("quantityReserved=4\n");
+        scenario.append("Sales:SALE-001\n");
+        scenario.append("quantitySold=25\n");
+        scenario.append("Vendor:VENDOR-001\n");
+        scenario.append("leadTimeDays=7\n");
+        scenario.append("Product:PROD-SHAMPOO-250 unchanged\n");
+        scenario.append("Location:LOC-001 unchanged");
+        printBlock("SCENARIO FACT VALUES", scenario.toString());
+
+        Gson gson = new Gson();
+        JsonObject root = new JsonObject();
+        root.add("inventory", gson.toJsonTree(inventory));
+        String arrayPayload = "[" + root.toString() + "]";
+
+        final JitFactExtractor domainExtractor = new JitFactExtractor();
+        FactExtractor publicationExtractor = new FactExtractor() {
+            @Override
+            public List<Fact> extract(String jsonArray) {
+                JsonArray elements =
+                        JsonParser.parseString(jsonArray).getAsJsonArray();
+                String elementJson = elements.get(0).toString();
+                return domainExtractor.extract(elementJson);
+            }
+        };
+
+        LLMContext context = new LLMContext();
+        context.build(
+                "jit_substrate",
+                arrayPayload,
+                publicationExtractor,
+                new JitRelationshipProvider(),
+                null);
+
+        CausalLLMBridge bridge = new CausalLLMBridge();
+        bridge.submit(context);
+
+        GraphBuilder graphBuilder = GraphBuilder.getInstance();
+        GraphSnapshot snapshot = null;
+        if (graphBuilder != null) {
+            snapshot = graphBuilder.snapshot();
+        }
+        printRelevantSnapshot(snapshot);
+
+        Fact publishedInventory = null;
+        if (snapshot != null && snapshot.nodes() != null) {
+            publishedInventory = snapshot.nodes().get("Inventory:INV-001");
+        }
+        String publishedText = null;
+        if (publishedInventory != null) {
+            publishedText = publishedInventory.getText();
+        }
+        if (publishedText == null
+                || publishedText.indexOf("\"quantityOnHand\":5") < 0
+                || publishedText.indexOf("\"quantityReserved\":4") < 0) {
+            throw new RuntimeException(
+                    "changed Inventory fact was not visible in the CGO snapshot: "
+                            + String.valueOf(publishedText));
+        }
+    }
+
+    private String loadJitSql() throws Exception {
+        InputStream stream =
+                JitDecisionIT.class.getResourceAsStream(
+                        "/jit/v14-jit-decision-query.json");
+        if (stream == null) {
+            throw new RuntimeException(
+                    "missing resource /jit/v14-jit-decision-query.json");
+        }
+
+        byte[] bytes;
+        try {
+            bytes = stream.readAllBytes();
+        } finally {
+            stream.close();
+        }
+        return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    private void observeOnce(String sql) {
+        System.out.print("=== RESTCLIENT REQUEST BEGIN ===\n");
+        System.out.print(sql);
+        System.out.print("\n=== RESTCLIENT REQUEST END ===\n");
+
+        QueryClient client = new RESTClient();
+        QueryResult result = client.query(sql);
+        String response = this.rawResponse(result);
+
+        System.out.print("=== RESTCLIENT RESPONSE BEGIN ===\n");
+        if (response == null) {
+            System.out.print("null\n");
+        } else {
+            System.out.print(response);
+            System.out.print("\n");
+        }
+        System.out.print("=== RESTCLIENT RESPONSE END ===\n");
+
+        String extracted = extractResultValue(response);
+        System.out.print("=== EXTRACTED RESULT BEGIN ===\n");
+        if (extracted == null) {
+            System.out.print("null\n");
+        } else {
+            System.out.print(extracted);
+            System.out.print("\n");
+        }
+        System.out.print("=== EXTRACTED RESULT END ===\n");
+    }
+
+    private void observeLoop(String sql, boolean successExpected) {
+        int runCount = Integer.parseInt(
+                System.getProperty("jit.runs", "1"));
+
+        int correct = 0;
+        int incorrect = 0;
+        int unresolved = 0;
+        int completed = 0;
+
+        for (int run = 1; run <= runCount; run++) {
+            System.out.print("=== RUN " + run + " BEGIN ===\n");
+            try {
+                System.out.print("=== RESTCLIENT REQUEST BEGIN ===\n");
+                System.out.print(sql);
+                System.out.print("\n=== RESTCLIENT REQUEST END ===\n");
+
+                QueryClient client = new RESTClient();
+                QueryResult result = client.query(sql);
+                String response = this.rawResponse(result);
+
+                System.out.print("=== RESTCLIENT RESPONSE BEGIN ===\n");
+                if (response == null) {
+                    System.out.print("null\n");
+                } else {
+                    System.out.print(response);
+                    System.out.print("\n");
+                }
+                System.out.print("=== RESTCLIENT RESPONSE END ===\n");
+
+                String extracted = extractCognitiveOutcome(response);
+                if (extracted == null) {
+                    unresolved = unresolved + 1;
+                } else if (successExpected && extracted.equalsIgnoreCase("success")) {
+                    correct = correct + 1;
+                } else if (successExpected && extracted.equalsIgnoreCase("fail")) {
+                    incorrect = incorrect + 1;
+                } else if (!successExpected && extracted.equalsIgnoreCase("fail")) {
+                    correct = correct + 1;
+                } else if (!successExpected && extracted.equalsIgnoreCase("success")) {
+                    incorrect = incorrect + 1;
+                } else {
+                    unresolved = unresolved + 1;
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                unresolved = unresolved + 1;
+            }
+            completed = completed + 1;
+            System.out.print("=== RUN " + run + " END ===\n");
+        }
+
+        int failures = incorrect + unresolved;
+        String failureRate = "0";
+        if (completed > 0) {
+            failureRate = Integer.toString((failures * 100) / completed);
+        }
+
+        System.out.print("=== OBSERVATION SUMMARY BEGIN ===\n");
+        System.out.print("completed invocations: " + completed + "\n");
+        if (successExpected) {
+            System.out.print("correct success: " + correct + "\n");
+        } else {
+            System.out.print("correct fail: " + correct + "\n");
+        }
+        System.out.print("incorrect decisions: " + incorrect + "\n");
+        System.out.print("missing/unresolved: " + unresolved + "\n");
+        System.out.print("semantic failures: " + failures + "\n");
+        System.out.print("semantic failure rate: " + failureRate + "%\n");
+        System.out.print("=== OBSERVATION SUMMARY END ===\n");
+    }
+
+    private String rawResponse(QueryResult result) {
+        if (result == null) {
+            return null;
+        }
+        if (result.getQueryExecutionJson() == null) {
+            return null;
+        }
+        QueryExecution<?> execution =
+                QueryExecution.fromJson(result.getQueryExecutionJson());
+        if (execution == null) {
+            return null;
+        }
+        return execution.getRawResponse();
     }
 
     private void printPublishedPhase0(GraphSnapshot snapshot) {
@@ -452,6 +473,49 @@ public class JitDecisionIT extends JitSubstrateIT {
         System.out.print("\n=== ");
         System.out.print(name);
         System.out.print(" END ===\n");
+    }
+
+    private static String extractCognitiveOutcome(String response) {
+        if (response == null) {
+            return null;
+        }
+        String content = unwrapMarkdownFence(response);
+        if (content == null) {
+            return null;
+        }
+        content = unwrapOuterDecoration(content.trim());
+        if (isStandaloneToken(content)) {
+            return content;
+        }
+        return extractResultValue(response);
+    }
+
+    private static String unwrapOuterDecoration(String content) {
+        String current = content.trim();
+        if (current.length() >= 4 && current.startsWith("**") && current.endsWith("**")) {
+            current = current.substring(2, current.length() - 2).trim();
+        }
+        if (current.length() >= 2 && current.startsWith("`") && current.endsWith("`")) {
+            current = current.substring(1, current.length() - 1).trim();
+        }
+        if (current.length() >= 2 && current.startsWith("\"") && current.endsWith("\"")) {
+            current = current.substring(1, current.length() - 1).trim();
+        }
+        return current;
+    }
+
+    private static boolean isStandaloneToken(String content) {
+        if (content == null || content.length() == 0) {
+            return false;
+        }
+        int i = 0;
+        while (i < content.length()) {
+            if (!Character.isLetter(content.charAt(i))) {
+                return false;
+            }
+            i++;
+        }
+        return true;
     }
 
     private static String extractResultValue(String response) {

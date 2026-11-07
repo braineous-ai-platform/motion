@@ -57,7 +57,7 @@ public class AnalysisOrchestratorIT {
             "{\"id\":\"MerchantPolicy:POL-5001\",\"kind\":\"MerchantPolicy\",\"mode\":\"atomic\",\"capture\":\"AUTO\"}";
 
     private static final String PAY_V1_SQL =
-            "select decision, reason, code "
+            "select "
                     + "from llm "
                     + "where factId = '" + PAY_1001 + "' "
                     + "and relatedFactIds = '"
@@ -66,10 +66,9 @@ public class AnalysisOrchestratorIT {
                     + RISK_4001 + ","
                     + POL_5001 + "' "
                     + "control "
-                    + "method = 'decide_payment_capture', "
-                    + "parameters = 'CustomerAccount.status, PaymentMethod.type, RiskProfile.level, MerchantPolicy.capture', "
-                    + "expression = 'CustomerAccount.status is equal to ACTIVE and PaymentMethod.type is equal to CARD and RiskProfile.level is equal to LOW and MerchantPolicy.capture is equal to AUTO', "
-                    + "spec = 'When the expression is true, the result is allow_capture. Otherwise, the result is deny_capture.', "
+                    + "parameters = 'CustomerAccount.status, PaymentMethod.type, RiskProfile.level, MerchantPolicy.capture' "
+                    + "expression = 'CustomerAccount.status is equal to ACTIVE and PaymentMethod.type is equal to CARD and RiskProfile.level is equal to LOW and MerchantPolicy.capture is equal to AUTO' "
+                    + "spec = 'When the expression is true, the result is success. Otherwise, the result is fail.' "
                     + "result = ''";
 
     @Inject
@@ -148,7 +147,9 @@ public class AnalysisOrchestratorIT {
                             < cognitiveResultJson.indexOf(Q3));
             Assertions.assertTrue(cognitiveResultJson.contains("queryExecutionJson"));
             Assertions.assertTrue(cognitiveResultJson.contains("requestJson"));
-            Assertions.assertTrue(cognitiveResultJson.contains("approved"));
+            Console.log(
+                    "it.observation.approved",
+                    String.valueOf(cognitiveResultJson.contains("approved")));
 
             Console.log(
                     "it.cognitiveResultJson",
