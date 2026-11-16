@@ -487,7 +487,7 @@ public class JitDecisionIT extends JitSubstrateIT {
         if (isStandaloneToken(content)) {
             return content;
         }
-        return extractResultValue(response);
+        return extractWrappedResult(response);
     }
 
     private static String unwrapOuterDecoration(String content) {
@@ -519,6 +519,22 @@ public class JitDecisionIT extends JitSubstrateIT {
     }
 
     private static String extractResultValue(String response) {
+        if (response == null) {
+            return null;
+        }
+
+        String content = unwrapMarkdownFence(response);
+        if (content == null) {
+            return null;
+        }
+        content = unwrapOuterDecoration(content.trim());
+        if ("success".equals(content) || "fail".equals(content)) {
+            return content;
+        }
+        return null;
+    }
+
+    private static String extractWrappedResult(String response) {
         if (response == null) {
             return null;
         }
