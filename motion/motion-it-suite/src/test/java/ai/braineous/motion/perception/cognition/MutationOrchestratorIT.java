@@ -61,19 +61,11 @@ public class MutationOrchestratorIT {
             "{\"id\":\"MerchantPolicy:POL-5001\",\"kind\":\"MerchantPolicy\",\"mode\":\"atomic\",\"capture\":\"AUTO\"}";
 
     private static final String PAY_V1_SQL =
-            "select "
-                    + "from llm "
-                    + "where factId = '" + PAY_1001 + "' "
-                    + "and relatedFactIds = '"
-                    + CUST_2001 + ","
-                    + PM_3001 + ","
-                    + RISK_4001 + ","
-                    + POL_5001 + "' "
-                    + "control "
-                    + "parameters = 'CustomerAccount.status, PaymentMethod.type, RiskProfile.level, MerchantPolicy.capture' "
-                    + "expression = 'CustomerAccount.status is equal to ACTIVE and PaymentMethod.type is equal to CARD and RiskProfile.level is equal to LOW and MerchantPolicy.capture is equal to AUTO' "
-                    + "spec = 'When the expression is true, the result is success. Otherwise, the result is fail.' "
-                    + "result = ''";
+            "select from llm "
+                    + "where factId = 'PaymentRequest:PAY-1001' "
+                    + "and relatedFactIds = 'CustomerAccount,PaymentMethod,RiskProfile,MerchantPolicy' "
+                    + "expression = '' "
+                    + "definition = 'When the expression is true, the result is success. Otherwise, the result is fail.'";
 
     @Inject
     MutationOrchestrator mutationOrchestrator;

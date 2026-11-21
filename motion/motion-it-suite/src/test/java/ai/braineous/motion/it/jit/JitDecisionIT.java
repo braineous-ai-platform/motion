@@ -1,5 +1,11 @@
 package ai.braineous.motion.it.jit;
 
+import ai.braineous.motion.ingestion.sinkprocessor.model.OperationalView;
+import ai.braineous.motion.perception.cognition.AnalysisQueryStore;
+import ai.braineous.motion.perception.cognition.CognitiveQueryExecutor;
+import ai.braineous.motion.perception.model.Observable;
+import ai.braineous.motion.perception.model.Observation;
+import ai.braineous.motion.perception.model.Perception;
 import ai.braineous.rag.prompt.cgo.api.Edge;
 import ai.braineous.rag.prompt.cgo.api.Fact;
 import ai.braineous.rag.prompt.cgo.api.FactExtractor;
@@ -7,6 +13,7 @@ import ai.braineous.rag.prompt.cgo.api.LLMContext;
 import ai.braineous.rag.prompt.cgo.api.QueryExecution;
 import ai.braineous.rag.prompt.models.cgo.graph.GraphBuilder;
 import ai.braineous.rag.prompt.models.cgo.graph.GraphSnapshot;
+import ai.braineous.rag.prompt.observe.Console;
 import ai.braineous.rag.prompt.services.cgo.causal.CausalLLMBridge;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -14,14 +21,20 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import io.braineous.dd.llm.pg.model.TxStepResult;
 import io.braineous.dd.llm.query.client.QueryClient;
 import io.braineous.dd.llm.query.client.QueryResult;
 import io.braineous.dd.llm.query.client.RESTClient;
+import io.braineous.dd.llm.transaction.model.TxExecutionResult;
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +50,14 @@ public class JitDecisionIT extends JitSubstrateIT {
             "Product:PROD-SHAMPOO-250",
             "Location:LOC-001"
     };
+
+    private static final String QUERY_NAME = "jit_decision_v14";
+
+    @Inject
+    CognitiveQueryExecutor cognitiveQueryExecutor;
+
+    @Inject
+    AnalysisQueryStore analysisQueryStore;
 
     @Test
     @Override
@@ -55,7 +76,17 @@ public class JitDecisionIT extends JitSubstrateIT {
             printPublishedPhase0(snapshot);
             printRelevantSnapshot(snapshot);
 
-            this.observeOnce(sql);
+            this.analysisQueryStore.put(QUERY_NAME, sql);
+            Assertions.assertEquals(sql, this.analysisQueryStore.get(QUERY_NAME));
+
+            Perception perception = this.jitPerception(snapshot);
+            List<String> queryNames = new ArrayList<String>();
+            queryNames.add(QUERY_NAME);
+
+            TxExecutionResult txResult =
+                    this.cognitiveQueryExecutor.analyze(perception, queryNames);
+
+            this.observeTxResult(txResult);
         } catch (RuntimeException exception) {
             printBlock("EXCEPTIONS", String.valueOf(exception));
             exception.printStackTrace(System.out);
@@ -66,6 +97,10 @@ public class JitDecisionIT extends JitSubstrateIT {
             exception.printStackTrace(System.out);
             exception.printStackTrace();
             throw new RuntimeException(exception);
+        } finally {
+            if (this.analysisQueryStore != null) {
+                this.analysisQueryStore.remove(QUERY_NAME);
+            }
         }
     }
 
@@ -243,6 +278,156 @@ public class JitDecisionIT extends JitSubstrateIT {
             stream.close();
         }
         return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    private Perception jitPerception(GraphSnapshot snapshot) {
+        Map<String, Fact> snapshotNodes = null;
+        Map<String, Edge> snapshotEdges = null;
+        if (snapshot != null) {
+            snapshotNodes = snapshot.nodes();
+            snapshotEdges = snapshot.edges();
+        }
+
+        List<Fact> facts = new ArrayList<Fact>();
+        Map<String, Fact> nodes = new HashMap<String, Fact>();
+        int index = 0;
+        while (index < QUERY_FACT_IDS.length) {
+            String factId = QUERY_FACT_IDS[index];
+            Fact fact = null;
+            if (snapshotNodes != null) {
+                fact = snapshotNodes.get(factId);
+            }
+            if (fact == null) {
+                fact = new Fact(factId, null);
+            }
+            facts.add(fact);
+            nodes.put(factId, fact);
+            index = index + 1;
+        }
+
+        Fact anchor = nodes.get("Inventory:INV-001");
+
+        Observable observable = new Observable();
+        observable.setObservableFactAnchor(anchor);
+        observable.setObservableFacts(facts);
+
+        OperationalView operationalView = new OperationalView();
+        operationalView.setViewId("ov-jit-decision-v14");
+        operationalView.setObservedView(facts);
+
+        Map<String, Edge> edges = new HashMap<String, Edge>();
+        if (snapshotEdges != null) {
+            for (String edgeId : snapshotEdges.keySet()) {
+                Edge edge = snapshotEdges.get(edgeId);
+                if (edge == null) {
+                    continue;
+                }
+                if (!nodes.containsKey(edge.getFromFactId())
+                        || !nodes.containsKey(edge.getToFactId())) {
+                    continue;
+                }
+                edges.put(edgeId, edge);
+            }
+        }
+
+        GraphSnapshot reasoningView = new GraphSnapshot(nodes, edges);
+
+        Observation observation = new Observation();
+        observation.setObservable(observable);
+        observation.setOperationalView(operationalView);
+        observation.setReasoningView(reasoningView);
+
+        Perception perception = new Perception();
+        perception.setObservation(observation);
+        return perception;
+    }
+
+    private void observeTxResult(TxExecutionResult txResult) {
+        Console.log("JitDecisionIT.txResult", String.valueOf(txResult));
+        Assertions.assertNotNull(txResult);
+        Assertions.assertNotNull(txResult.getStepResults());
+
+        List<String> commitOrder = txResult.getCommitOrder();
+        Assertions.assertNotNull(commitOrder);
+        Assertions.assertEquals(1, commitOrder.size());
+        Assertions.assertEquals(QUERY_NAME, commitOrder.get(0));
+
+        List<TxStepResult> steps = txResult.getStepResults();
+        Console.log(
+                "JitDecisionIT.completedSteps",
+                String.valueOf(steps.size()));
+        Assertions.assertTrue(steps.size() <= commitOrder.size());
+
+        if (txResult.getGateResult() == null) {
+            Console.log("JitDecisionIT.gate", "null");
+        } else {
+            Console.log("JitDecisionIT.gate", String.valueOf(txResult.getGateResult()));
+        }
+        Console.log(
+                "JitDecisionIT.approved",
+                String.valueOf(txResult.isApproved()));
+
+        if (txResult.toJson() == null) {
+            printBlock("TX RESULT JSON", "null");
+        } else {
+            printBlock("TX RESULT JSON", txResult.toJson());
+        }
+
+        int index = 0;
+        while (index < steps.size()) {
+            TxStepResult step = steps.get(index);
+            Assertions.assertNotNull(step);
+            Assertions.assertEquals(commitOrder.get(index), step.getId());
+            this.observeStep(step);
+            index = index + 1;
+        }
+    }
+
+    private void observeStep(TxStepResult step) {
+        QueryResult queryResult = step.getQueryResult();
+        Console.log("JitDecisionIT.step.id", String.valueOf(step.getId()));
+        if (queryResult == null) {
+            Console.log("JitDecisionIT.queryResult", "null");
+            printBlock("REQUEST JSON", "null");
+            printBlock("QUERY EXECUTION JSON", "null");
+            printBlock("RAW MODEL RESPONSE", "null");
+            return;
+        }
+
+        Console.log(
+                "JitDecisionIT.queryResult.ok",
+                String.valueOf(queryResult.isOk()));
+        if (queryResult.getWhy() == null) {
+            Console.log("JitDecisionIT.queryResult.why", "null");
+        } else {
+            Console.log(
+                    "JitDecisionIT.queryResult.why",
+                    String.valueOf(queryResult.getWhy()));
+        }
+
+        if (queryResult.getRequestJson() == null) {
+            printBlock("REQUEST JSON", "null");
+        } else {
+            printBlock("REQUEST JSON", queryResult.getRequestJson().toString());
+        }
+
+        if (queryResult.getQueryExecutionJson() == null) {
+            printBlock("QUERY EXECUTION JSON", "null");
+            printBlock("RAW MODEL RESPONSE", "null");
+            return;
+        }
+
+        printBlock(
+                "QUERY EXECUTION JSON",
+                queryResult.getQueryExecutionJson().toString());
+
+        QueryExecution<?> execution =
+                QueryExecution.fromJson(queryResult.getQueryExecutionJson());
+        if (execution == null || execution.getRawResponse() == null) {
+            printBlock("RAW MODEL RESPONSE", "null");
+        } else {
+            printBlock("RAW MODEL RESPONSE", execution.getRawResponse());
+        }
     }
 
     private void observeOnce(String sql) {
